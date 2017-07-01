@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="ba5e9602496bffbed8ee1dba5945822c6b2bf376" name="MPL_Test">
+<index version="1" commit="50012897f4868f1849c582790c2e44c6b5d873fa" name="MPL_Test">
   <category name="Test">
     <reapack name="mpl_ProjectPlaylist.lua" type="script" desc="ProjectPlaylist">
       <metadata>
@@ -8,6 +8,10 @@
       <version name="0.01" author="MPL" time="2017-07-01T13:18:06Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/ba5e9602496bffbed8ee1dba5945822c6b2bf376/Test/mpl_ProjectPlaylist.lua</source>
+      </version>
+      <version name="0.02" author="MPL" time="2017-07-01T13:58:03Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/50012897f4868f1849c582790c2e44c6b5d873fa/Test/mpl_ProjectPlaylist.lua</source>
       </version>
     </reapack>
   </category>
