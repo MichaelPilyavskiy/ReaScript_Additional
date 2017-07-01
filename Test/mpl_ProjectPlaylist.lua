@@ -1,4 +1,4 @@
--- @version 0.01
+-- @version 0.02
 -- @author MPL
 -- @changelog
 --   + init
@@ -6,11 +6,13 @@
 -- @website http://forum.cockos.com/member.php?u=70694
   
   --[[ changelog
-    01.07.2017  0.01 init alpha
+    0.02 init alpha 01.07.2017  
       basic GUI
-      load current opened project on start
+      load current opened project on start 
       save/load playlist
       selecting tabs
+      objects init/update improvements
+      dragndrop project in list
   ]]
   
   
@@ -25,11 +27,11 @@
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'
   local mouse = {}
   local gui -- see GUI_define()
-   obj = {}
+  local obj = {}
   local conf = {}
   local cycle = 0
   local redraw = 1
-  local SCC, lastSCC, SCC_trig
+  local SCC, lastSCC, SCC_trig,drag_mode,last_drag_mode
   local ProjState
   playlist = {}
   ---------------------------------------------------
@@ -54,7 +56,7 @@
     gfx.blit( 2, 1, math.rad(o.grad_blit_rot), -- grad back
               0,0,  obj.grad_sz,math.ceil(obj.grad_sz*o.grad_blit_h_coeff),
               x,y,w,h, 0,0)
-    if o.active and o.active == 1 then     col('green', 0.43) gfx.rect(x,y,w,h,1) end
+    if o.active  then     col('green', 0.43) gfx.rect(x,y,w,h,1) end
     col('white', 0.8)
     gfx.setfont(1, gui.fontname, gui.fontsz)
     gfx.x = x+ (w-gfx.measurestr(txt))/2
@@ -77,7 +79,13 @@
     --// 3 dynamic stuff
     -- 4 playlist
       if redraw == 0 then -- dynamic
-        
+         if drag_id_dest then 
+          gfx.line(0,obj.menu_b_h + obj.it_h*(drag_id_dest-1) , 
+                   gfx.w, obj.menu_b_h + obj.it_h*(drag_id_dest-1)
+                    )
+         end
+        else
+         
       end
       
     --  init
@@ -105,6 +113,7 @@
       
     -- refresh
       if redraw == 1 then 
+        OBJ_define()
         -- refresh backgroung
           gfx.dest = 1
           gfx.setimgdim(1, -1, -1)  
@@ -163,29 +172,8 @@
     end
   end
   ---------------------------------------------------
-  local function OBJ_Update()
-    obj.menu.w = gfx.w
-    for i = 1, #playlist do
-      obj['PLitem_'..i] = {x = 0,
-                       y = obj.it_h*(i-1),
-                       w = gfx.w,
-                       h = obj.it_h,
-                       txt = GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
-                       a = 1,
-                       grad_blit_h_coeff = 0.3,
-                       grad_blit_rot = 180,
-                       mouse_offs_y = obj.menu_b_h,
-                       func = function()                                 
-                                for i = 1, #playlist do obj['PLitem_'..i].active = 0 end
-                                obj['PLitem_'..i].active = 1
-                                redraw = 1
-                                SelectProjectInstance( playlist[i].ptr )
-                              end}
-    end
-  end
-  ---------------------------------------------------
   local function Actions_AddOpenedProjectsToPlaylist()
-    for i = 1, 100 do
+    for i = 1, 50 do
       local retval, projfn=  EnumProjects( i-1, '' )
       if projfn == '' then break end
       playlist[#playlist+1] = {ptr = retval, path = projfn }
@@ -200,10 +188,14 @@
                 func =  function() 
                           local retval, projfn=  EnumProjects( -1, '' )
                           playlist[#playlist+1] = {ptr = retval, path = projfn }
+                          redraw = 1
                         end
               },
               {  txt = '|Add all opened project to playlist (ignore projects without saved RPP)',
-                 func = function() Actions_AddOpenedProjectsToPlaylist() end
+                 func = function() 
+                          Actions_AddOpenedProjectsToPlaylist() 
+                          redraw = 1
+                        end
                },
               { txt = '||Load projects from playlist',
                 func =  function()  
@@ -227,11 +219,13 @@
                             end
                             SelectProjectInstance( EnumProjects( 0, '') )
                             Main_OnCommand(40860,0) -- Close current project tab
+                            redraw = 1
                           end
                         end   
                 },   
               { txt = '|'..is_dirty..'Save playlist',
                 func =  function()  
+                          local out_str = ''
                           for i = 1, #playlist do out_str = out_str..playlist[i].path..'\n' end                          
                           local f = io.open(playlist.fn, 'w')                          
                           f:write(out_str)
@@ -247,8 +241,16 @@
                           local f = io.open(fp, 'w')                          
                           f:write(out_str)
                           f:close()
+                          playlist.fn = fp
                         end
-              }
+                },
+              { txt = '|Open /REAPER/MPL ProjectPlaylist path',
+                func =  function()  
+                          local OS, cmd = GetOS()                          
+                          if OS:find("OSX") then cmd = 'open' else cmd = 'start' end
+                          os.execute(cmd..' "" "' .. playlists_path .. '"')
+                        end
+              }              
             }
     local str = ""
     for i = 1, #str_t do str = str..str_t[i].txt end
@@ -256,7 +258,7 @@
     if ret > 0 then str_t[ret].func() end
   end
   ---------------------------------------------------
-  local function OBJ_define()  
+  function OBJ_define()  
     obj.offs = 2
     obj.menu_b_h = 40
     obj.it_h = 35
@@ -272,12 +274,36 @@
                 txt = 'Menu',
                 mouse_offs_y = 0,
                 func = function() Menu() end}
+                
+    for i = 1, #playlist do
+      if playlist[i].ptr then 
+        obj['PLitem_'..i] = {x = 0,
+                         y = obj.it_h*(i-1),
+                         w = gfx.w,
+                         h = obj.it_h,
+                         txt = GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
+                         a = 1,
+                         grad_blit_h_coeff = 0.3,
+                         grad_blit_rot = 180,
+                         mouse_offs_y = obj.menu_b_h,
+                         active = EnumProjects( -1, '' ) == playlist[i].ptr,
+                         func = function()                                 
+                                  SelectProjectInstance( playlist[i].ptr )
+                                  redraw = 1
+                                end}
+      end
+    end        
+  end
+  ---------------------------------------------------
+  function OBJ_Update()
+    --obj.menu.w = gfx.w
+    --for i = 1, #playlist do if playlist[i].ptr and obj['PLitem_'..i] then obj['PLitem_'..i].w = gfx.w end  end
   end
  ---------------------------------------------------
   local function MOUSE_Match(b)return mouse.mx > b.x and mouse.mx < b.x+b.w and mouse.my > b.y + b.mouse_offs_y and mouse.my < b.y+b.mouse_offs_y+b.h end 
  --------------------------------------------------- 
   local function MOUSE_Click(b) return MOUSE_Match(b) and mouse.LMB_state and not mouse.last_LMB_state end
-  ---------------------------------------------------
+  ---------------------------------------------------    
   local function MOUSE()
     mouse.mx = gfx.mouse_x
     mouse.my = gfx.mouse_y
@@ -294,9 +320,32 @@
     if mouse.last_mx_onclick and mouse.last_my_onclick then mouse.dx = mouse.mx - mouse.last_mx_onclick  mouse.dy = mouse.my - mouse.last_my_onclick else mouse.dx, mouse.dy = 0,0 end
 
     -- butts    
-      for key in pairs(obj) do if type(obj[key]) == 'table'then if MOUSE_Click(obj[key]) then if obj[key].func then obj[key].func()end break end end end
-        
+      for key in pairs(obj) do if type(obj[key]) == 'table'then 
+        if MOUSE_Match(obj[key]) then mouse.context = key end
+        if MOUSE_Click(obj[key]) then           
+          mouse.context_latch = key
+          if obj[key].func then obj[key].func() break end end           
+        end 
+      end
+    
+    -- drag
+      drag_mode = mouse.LMB_state and mouse.context and mouse.context_latch and mouse.context_latch ~= ''
+      if drag_mode then
+        drag_id_src = mouse.context_latch:match('[%d]+') if drag_id_src then drag_id_src = tonumber(drag_id_src) end
+        drag_id_dest = mouse.context:match('[%d]+') if drag_id_dest then drag_id_dest = tonumber(drag_id_dest) end
+      end
+      if last_drag_mode and not drag_mode and drag_id_dest and drag_id_src then
+        local entry = playlist[drag_id_src]
+        table.remove(playlist, drag_id_src)
+        table.insert(playlist, drag_id_dest, entry)
+        drag_id_src, drag_id_dest = nil, nil 
+        OBJ_define()
+        redraw = 1
+      end
+      
+      
     -- mouse release    
+      last_drag_mode = drag_mode
       if mouse.last_LMB_state and not mouse.LMB_state   then  mouse.context_latch = '' end
       mouse.last_LMB_state = mouse.LMB_state  
       mouse.last_RMB_state = mouse.RMB_state
@@ -312,10 +361,16 @@
     clock = os.clock()
     cycle = cycle+1
     local st_wind = HasWindXYWHChanged()
-    if st_wind >= -1 then ExtState_Save() if math.abs(st_wind) == 1 then redraw = st_wind OBJ_Update() end end
-    if SCC_trig then OBJ_Update() end
-    MOUSE()
+    if st_wind == -1 then 
+      redraw = -1 
+     elseif st_wind == 1 then
+      redraw = 1
+      ExtState_Save()
+     elseif st_wind == 2 then
+      ExtState_Save()      
+    end
     GUI_draw()
+    MOUSE()
     if gfx.getchar() >= 0 then defer(run) else atexit(gfx.quit) end
   end
   ---------------------------------------------------
@@ -339,9 +394,7 @@
   ExtState_Load()  
   gfx.init('MPL ProjectPlaylist',conf.wind_w, conf.wind_h, conf.dock, conf.wind_x, conf.wind_y)
   OBJ_define()
-  OBJ_Update()
   GUI_define()
-  Actions_AddOpenedProjectsToPlaylist() -- debug
   run()
   
   
