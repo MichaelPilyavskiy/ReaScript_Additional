@@ -1,7 +1,14 @@
--- @version 0.11
+-- @version 0.20
 -- @author MPL
 -- @changelog
---   + init
+--    progress bar
+--    active state
+--    playing state
+--    clickable play buttons
+--    dragndrop
+--    redraw background/static buttons fix
+--    small menu button
+--    add current opened projects at startup
 -- @description ProjectPlaylist
 -- @website http://forum.cockos.com/member.php?u=70694
   
@@ -13,13 +20,14 @@
       selecting tabs
       objects init/update improvements
       dragndrop project in list
-    0.10 02.07.2017
+    0.20 02.07.2017
       progress bar
       active state
       clickable play buttons
       dragndrop
-    0.11 02.07.2017
       redraw background/static buttons fix
+      small menu button
+      limit playing progress to end of every project
   ]]
   
   
@@ -29,13 +37,13 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.11
+  local vrs = 0.20
   debug = 0
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'
-  local mouse = {}
+   mouse = {}
   local gui -- see GUI_define()
-  obj = {}
+  obj = {blit_offs = 0}
   local conf = {}
   local cycle = 0
   local redraw = 1
@@ -72,11 +80,9 @@
     -- progress      
       if o.progress then 
         col('green', 0.43) 
-        gfx.rect(x,y,w*o.progress,h,1)end     
-    -- playstate
-      if o.playstate then
-      
-      end
+        gfx.rect(x,y,w*o.progress,h,1)
+      end     
+
     col('white', 0.8)
     gfx.setfont(1, gui.fontname, gui.fontsz)
     gfx.x = x+ (w-gfx.measurestr(txt))/2
@@ -87,8 +93,17 @@
   local function GUI_Playlist()
     gfx.dest = 4
     gfx.setimgdim(4, -1, -1)  
-    gfx.setimgdim(4, gfx.w,gfx.h - obj.menu_b_h)  
+    gfx.setimgdim(4, gfx.w, obj.it_h * #playlist)  
     for key in pairs(obj) do if type(obj[key]) == 'table' and key:find('PLitem') then GUI_DrawObj(obj[key]) end end          
+    
+    if drag_id_dest and drag_id_src and drag_id_dest ~= drag_id_src then 
+     local add
+     if drag_id_dest > drag_id_src then add = 0 else add =1 end
+     gfx.line(0,obj.it_h*(drag_id_dest-add),
+              gfx.w, obj.it_h*(drag_id_dest-add)
+               )
+    end
+    
   end
   ---------------------------------------------------
   local function GUI_draw()
@@ -98,17 +113,6 @@
     -- 2 gradient
     --// 3 dynamic stuff
     -- 4 playlist
-      if redraw == 0 then -- dynamic
-         if drag_id_dest and drag_id_dest ~= drag_id_src then 
-          local add
-          if drag_id_dest > drag_id_src then add = 0 else add =1 end
-          gfx.line(0,obj.menu_b_h + obj.it_h*(drag_id_dest-add) , 
-                   gfx.w, obj.menu_b_h + obj.it_h*(drag_id_dest-add)
-                    )
-         end
-        else
-         
-      end
       
     --  init
       if redraw == -1 then
@@ -137,16 +141,17 @@
           gfx.blit( 2, 1, 0, -- grad back
                     0,0,  obj.grad_sz,obj.grad_sz,
                     0,0,  gfx.w,gfx.h, 0,0)
-          gfx.a = 0.1
-        -- refresh all buttons
-          for key in pairs(obj) do if type(obj[key]) == 'table' and not key:find('PLitem') then GUI_DrawObj(obj[key]) end end          
+          gfx.a = 1
+          GUI_DrawObj(obj.menu)       
       end
             
     -- dynamic list
       GUI_Playlist()
+    
+      
       
     --  render    
-      gfx.dest = -1   
+      gfx.dest = -1  
       gfx.a = 1
       gfx.x,gfx.y = 0,0
       --  back
@@ -154,9 +159,12 @@
           0,0,gfx.w, gfx.h,
           0,0,gfx.w, gfx.h, 0,0)  
       --  PL
-      gfx.blit(4, 1, 0, -- backgr
-          0,0,gfx.w, gfx.h - obj.menu_b_h,
-          0,obj.menu_b_h,gfx.w, gfx.h - obj.menu_b_h, 0,0)            
+      local y_sh = lim(obj.it_h * #playlist - gfx.h, 0, gfx.h) * obj.blit_offs
+      gfx.blit(4, 1, 0, -- PL
+          0,0, gfx.w, obj.it_h * #playlist,
+          0,-y_sh, gfx.w, obj.it_h * #playlist, 0,0)  
+                   
+      GUI_DrawObj(obj.scrollbar)  
     
     redraw = 0
     gfx.update()
@@ -280,20 +288,33 @@
   ---------------------------------------------------
   function OBJ_define()  
     obj.offs = 2
-    obj.menu_b_h = 40
-    obj.it_h = 35
+    obj.menu_b_h = 30
+    obj.it_h = 25
     obj.grad_sz = 500 -- gradient rect
     obj.proj_playb_w = 30
+    obj.scrollbar_w = 30
     
-    obj.menu = {x = 0,
-                y = 0,
-                w= gfx.w,
-                h = obj.menu_b_h,
-                a = 0.5,
+    --obj.scrollbar = obj.it_h * #playlist
+    
+    obj.scrollbar = {x = gfx.w-obj.scrollbar_w,
+                y = obj.menu_b_h,
+                w= obj.scrollbar_w,
+                h =gfx.h-obj.menu_b_h,
+                a = 0.8,
                 grad_blit_h_coeff = 1,
                 grad_blit_rot = 0,
-                txt = 'Menu',
-                mouse_offs_y = 0,
+                txt = '',
+                draw_dyn = true}    
+                               
+                    
+    obj.menu = {x = gfx.w-obj.scrollbar_w,
+                y = 0,
+                w= obj.scrollbar_w,
+                h = obj.menu_b_h,
+                a = 0.2,
+                grad_blit_h_coeff = 1,
+                grad_blit_rot = 0,
+                txt = 'M',
                 func = function() Menu() end}
                 
     for i = 1, #playlist do
@@ -306,7 +327,7 @@
                          a = 1,
                          grad_blit_h_coeff = 0.3,
                          grad_blit_rot = 180,
-                         mouse_offs_y = obj.menu_b_h,
+                         --mouse_offs_y = obj.menu_b_h,
                          func = function()           
                                   local state = GetPlayStateEx( playlist[i].ptr ) == 1                   
                                   if state then OnStopButtonEx( playlist[i].ptr  )
@@ -314,13 +335,13 @@
                                 end}      
         obj['PLitem_'..i] = {x = obj.proj_playb_w,
                          y = obj.it_h*(i-1),
-                         w = gfx.w-obj.proj_playb_w,
+                         w = gfx.w-obj.proj_playb_w-obj.scrollbar_w,
                          h = obj.it_h,
                          txt = GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
                          a = 1,
                          grad_blit_h_coeff = 0.3,
                          grad_blit_rot = 180,
-                         mouse_offs_y = obj.menu_b_h,
+                         --mouse_offs_y = obj.menu_b_h + obj.blit_offs*  (obj.it_h * #playlist - (gfx.h - obj.menu_b_h)),
                          func = function()                                 
                                   SelectProjectInstance( playlist[i].ptr )
                                   redraw = 1
@@ -331,22 +352,36 @@
   end
   ---------------------------------------------------
   function OBJ_Update()
-    obj.menu.w = gfx.w
+    obj.blit_h = obj.it_h * #playlist
+    
+    obj.scrollbar.x = gfx.w-obj.scrollbar_w
+    obj.scrollbar.h = (gfx.h-obj.menu_b_h) * lim( gfx.h/obj.blit_h , 0, 1)
+    obj.scrollbar.y = obj.menu_b_h +  obj.blit_offs * ((gfx.h-obj.menu_b_h) - obj.scrollbar.h)
+    
     for i = 1, #playlist do 
       if playlist[i].ptr and obj['PLitem_'..i] then 
-        obj['PLitem_'..i].w = gfx.w-obj.proj_playb_w
+        obj['PLitem_'..i].w = gfx.w-obj.proj_playb_w-obj.scrollbar_w
         obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
-        if GetPlayStateEx( playlist[i].ptr ) == 1 then
-          obj['PLitem_play_'..i].txt = '>'
-         else
-          obj['PLitem_play_'..i].txt = '|'
-        end
-        if GetProjectLength( playlist[i].ptr ) > 0 then obj['PLitem_'..i].progress =   GetPlayPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ) end
+        obj['PLitem_'..i].mouse_offs_y = -lim(obj.it_h * #playlist - gfx.h, 0, gfx.h) * obj.blit_offs
+        obj['PLitem_play_'..i].mouse_offs_y = obj['PLitem_'..i].mouse_offs_y
+        if GetPlayStateEx( playlist[i].ptr ) == 1 then obj['PLitem_play_'..i].txt = '>'
+         else obj['PLitem_play_'..i].txt = '|'  end
+        if GetProjectLength( playlist[i].ptr ) > 0 then 
+          obj['PLitem_'..i].progress =   
+            lim(GetPlayPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ),0,1) end
       end  
     end
   end
  ---------------------------------------------------
-  local function MOUSE_Match(b)return mouse.mx > b.x and mouse.mx < b.x+b.w and mouse.my > b.y + b.mouse_offs_y and mouse.my < b.y+b.mouse_offs_y+b.h end 
+  local function MOUSE_Match(b) 
+    if not b.mouse_offs_y then b.mouse_offs_y = 0 end
+    if not b.ignore_mouse then 
+      return mouse.mx > b.x 
+        and mouse.mx < b.x+b.w 
+        and mouse.my > b.y+b.mouse_offs_y
+        and mouse.my < b.y+b.mouse_offs_y+b.h 
+    end 
+  end
  --------------------------------------------------- 
   local function MOUSE_Click(b) return MOUSE_Match(b) and mouse.LMB_state and not mouse.last_LMB_state end
   ---------------------------------------------------    
@@ -366,11 +401,15 @@
     if mouse.last_mx_onclick and mouse.last_my_onclick then mouse.dx = mouse.mx - mouse.last_mx_onclick  mouse.dy = mouse.my - mouse.last_my_onclick else mouse.dx, mouse.dy = 0,0 end
 
     -- butts    
-      for key in pairs(obj) do if type(obj[key]) == 'table'then 
-        if MOUSE_Match(obj[key]) then mouse.context = key end
-        if MOUSE_Click(obj[key]) then           
-          mouse.context_latch = key
-          if obj[key].func then obj[key].func() break end end           
+      for key in pairs(obj) do 
+        if type(obj[key]) == 'table'then 
+          if MOUSE_Match(obj[key]) then mouse.context = key end
+          if MOUSE_Click(obj[key]) then           
+            mouse.context_latch = key
+            if obj[key].func then 
+              obj[key].func() break 
+            end 
+          end           
         end 
       end
     
@@ -379,6 +418,11 @@
       if drag_mode then
         drag_id_src = mouse.context_latch:match('[%d]+') if drag_id_src then drag_id_src = tonumber(drag_id_src) end
         drag_id_dest = mouse.context:match('[%d]+') if drag_id_dest then drag_id_dest = tonumber(drag_id_dest) end
+        if mouse.my < 0 then 
+          obj.blit_offs = lim(obj.blit_offs - 0.05, 0,1)
+         elseif mouse.my > gfx.h then 
+          obj.blit_offs = lim(obj.blit_offs + 0.05, 0,1)
+        end
       end
       if last_drag_mode and not drag_mode and drag_id_dest and drag_id_src then
         local entry = playlist[drag_id_src]
@@ -390,7 +434,16 @@
         redraw = 1
       end
       
+    -- scrollbar      
+      if  obj.it_h * #playlist > gfx.h - obj.menu_b_h  then
+        if MOUSE_Click(obj.scrollbar) then blit_offs_latch = obj.blit_offs end
+        if mouse.context_latch and mouse.context_latch == 'scrollbar' then
+          obj.blit_offs = lim(blit_offs_latch + mouse.dy/100)
+        end
+      end
       
+      
+        
     -- mouse release    
       last_drag_mode = drag_mode
       if mouse.last_LMB_state and not mouse.LMB_state   then  mouse.context_latch = '' end
@@ -412,6 +465,7 @@
       redraw = -1 
      elseif st_wind == 1 then
       redraw = -1
+      OBJ_define()
       ExtState_Save()
      elseif st_wind == 2 then
       ExtState_Save()      
@@ -431,7 +485,8 @@
                 col = { grey =    {0.5, 0.5,  0.5 },
                         white =   {1,   1,    1   },
                         red =     {1,   0,    0   },
-                        green =   {0,   1,    0.3   }
+                        green =   {0,   1,    0.3   },
+                        blue =    {0,   0,    1}
                       }
                 
                 }
