@@ -1,4 +1,4 @@
--- @version 0.10
+-- @version 0.11
 -- @author MPL
 -- @changelog
 --   + init
@@ -18,6 +18,8 @@
       active state
       clickable play buttons
       dragndrop
+    0.11 02.07.2017
+      redraw background/static buttons fix
   ]]
   
   
@@ -27,7 +29,7 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.10
+  local vrs = 0.11
   debug = 0
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'
@@ -332,7 +334,7 @@
     obj.menu.w = gfx.w
     for i = 1, #playlist do 
       if playlist[i].ptr and obj['PLitem_'..i] then 
-        obj['PLitem_'..i].w = gfx.w 
+        obj['PLitem_'..i].w = gfx.w-obj.proj_playb_w
         obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
         if GetPlayStateEx( playlist[i].ptr ) == 1 then
           obj['PLitem_play_'..i].txt = '>'
@@ -409,7 +411,7 @@
     if st_wind == -1 then 
       redraw = -1 
      elseif st_wind == 1 then
-      redraw = 1
+      redraw = -1
       ExtState_Save()
      elseif st_wind == 2 then
       ExtState_Save()      
