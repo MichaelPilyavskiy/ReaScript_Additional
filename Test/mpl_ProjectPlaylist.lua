@@ -1,4 +1,4 @@
--- @version 0.02
+-- @version 0.10
 -- @author MPL
 -- @changelog
 --   + init
@@ -13,6 +13,11 @@
       selecting tabs
       objects init/update improvements
       dragndrop project in list
+    0.10 02.07.2017
+      progress bar
+      active state
+      clickable play buttons
+      dragndrop
   ]]
   
   
@@ -22,18 +27,19 @@
   
   
   --  INIT -------------------------------------------------  
-  debug = 1
+  local vrs = 0.10
+  debug = 0
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'
   local mouse = {}
   local gui -- see GUI_define()
-  local obj = {}
+  obj = {}
   local conf = {}
   local cycle = 0
   local redraw = 1
   local SCC, lastSCC, SCC_trig,drag_mode,last_drag_mode
   local ProjState
-  playlist = {}
+  local playlist = {}
   ---------------------------------------------------
   local function lim(val, min,max) --local min,max 
     if not min or not max then min, max = 0,1 end 
@@ -56,7 +62,19 @@
     gfx.blit( 2, 1, math.rad(o.grad_blit_rot), -- grad back
               0,0,  obj.grad_sz,math.ceil(obj.grad_sz*o.grad_blit_h_coeff),
               x,y,w,h, 0,0)
-    if o.active  then     col('green', 0.43) gfx.rect(x,y,w,h,1) end
+    if o.active  then  
+      col('white', 0.8)
+      gfx.rect(x,y,w,h,0)     
+    end
+    
+    -- progress      
+      if o.progress then 
+        col('green', 0.43) 
+        gfx.rect(x,y,w*o.progress,h,1)end     
+    -- playstate
+      if o.playstate then
+      
+      end
     col('white', 0.8)
     gfx.setfont(1, gui.fontname, gui.fontsz)
     gfx.x = x+ (w-gfx.measurestr(txt))/2
@@ -79,9 +97,11 @@
     --// 3 dynamic stuff
     -- 4 playlist
       if redraw == 0 then -- dynamic
-         if drag_id_dest then 
-          gfx.line(0,obj.menu_b_h + obj.it_h*(drag_id_dest-1) , 
-                   gfx.w, obj.menu_b_h + obj.it_h*(drag_id_dest-1)
+         if drag_id_dest and drag_id_dest ~= drag_id_src then 
+          local add
+          if drag_id_dest > drag_id_src then add = 0 else add =1 end
+          gfx.line(0,obj.menu_b_h + obj.it_h*(drag_id_dest-add) , 
+                   gfx.w, obj.menu_b_h + obj.it_h*(drag_id_dest-add)
                     )
          end
         else
@@ -108,12 +128,6 @@
                         r,g,b,a, 
                         drdx, dgdx, dbdx, dadx, 
                         drdy, dgdy, dbdy, dady) 
-        redraw = 1 -- force com redraw after init 
-      end
-      
-    -- refresh
-      if redraw == 1 then 
-        OBJ_define()
         -- refresh backgroung
           gfx.dest = 1
           gfx.setimgdim(1, -1, -1)  
@@ -124,19 +138,20 @@
           gfx.a = 0.1
         -- refresh all buttons
           for key in pairs(obj) do if type(obj[key]) == 'table' and not key:find('PLitem') then GUI_DrawObj(obj[key]) end end          
-        -- refresh playlist
-          GUI_Playlist()
       end
             
+    -- dynamic list
+      GUI_Playlist()
+      
     --  render    
       gfx.dest = -1   
       gfx.a = 1
       gfx.x,gfx.y = 0,0
-    --  back
+      --  back
       gfx.blit(1, 1, 0, -- backgr
           0,0,gfx.w, gfx.h,
           0,0,gfx.w, gfx.h, 0,0)  
-    --  PL
+      --  PL
       gfx.blit(4, 1, 0, -- backgr
           0,0,gfx.w, gfx.h - obj.menu_b_h,
           0,obj.menu_b_h,gfx.w, gfx.h - obj.menu_b_h, 0,0)            
@@ -189,12 +204,14 @@
                           local retval, projfn=  EnumProjects( -1, '' )
                           playlist[#playlist+1] = {ptr = retval, path = projfn }
                           redraw = 1
+                          OBJ_define()
                         end
               },
               {  txt = '|Add all opened project to playlist (ignore projects without saved RPP)',
                  func = function() 
                           Actions_AddOpenedProjectsToPlaylist() 
                           redraw = 1
+                          OBJ_define()
                         end
                },
               { txt = '||Load projects from playlist',
@@ -220,6 +237,7 @@
                             SelectProjectInstance( EnumProjects( 0, '') )
                             Main_OnCommand(40860,0) -- Close current project tab
                             redraw = 1
+                            OBJ_define()
                           end
                         end   
                 },   
@@ -263,6 +281,7 @@
     obj.menu_b_h = 40
     obj.it_h = 35
     obj.grad_sz = 500 -- gradient rect
+    obj.proj_playb_w = 30
     
     obj.menu = {x = 0,
                 y = 0,
@@ -277,27 +296,52 @@
                 
     for i = 1, #playlist do
       if playlist[i].ptr then 
-        obj['PLitem_'..i] = {x = 0,
+        obj['PLitem_play_'..i] = {x = 0,
                          y = obj.it_h*(i-1),
-                         w = gfx.w,
+                         w = obj.proj_playb_w,
+                         h = obj.it_h,
+                         txt = '',
+                         a = 1,
+                         grad_blit_h_coeff = 0.3,
+                         grad_blit_rot = 180,
+                         mouse_offs_y = obj.menu_b_h,
+                         func = function()           
+                                  local state = GetPlayStateEx( playlist[i].ptr ) == 1                   
+                                  if state then OnStopButtonEx( playlist[i].ptr  )
+                                   else OnPlayButtonEx( playlist[i].ptr ) end
+                                end}      
+        obj['PLitem_'..i] = {x = obj.proj_playb_w,
+                         y = obj.it_h*(i-1),
+                         w = gfx.w-obj.proj_playb_w,
                          h = obj.it_h,
                          txt = GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
                          a = 1,
                          grad_blit_h_coeff = 0.3,
                          grad_blit_rot = 180,
                          mouse_offs_y = obj.menu_b_h,
-                         active = EnumProjects( -1, '' ) == playlist[i].ptr,
                          func = function()                                 
                                   SelectProjectInstance( playlist[i].ptr )
                                   redraw = 1
+                                  OBJ_Update()
                                 end}
       end
     end        
   end
   ---------------------------------------------------
   function OBJ_Update()
-    --obj.menu.w = gfx.w
-    --for i = 1, #playlist do if playlist[i].ptr and obj['PLitem_'..i] then obj['PLitem_'..i].w = gfx.w end  end
+    obj.menu.w = gfx.w
+    for i = 1, #playlist do 
+      if playlist[i].ptr and obj['PLitem_'..i] then 
+        obj['PLitem_'..i].w = gfx.w 
+        obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
+        if GetPlayStateEx( playlist[i].ptr ) == 1 then
+          obj['PLitem_play_'..i].txt = '>'
+         else
+          obj['PLitem_play_'..i].txt = '|'
+        end
+        if GetProjectLength( playlist[i].ptr ) > 0 then obj['PLitem_'..i].progress =   GetPlayPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ) end
+      end  
+    end
   end
  ---------------------------------------------------
   local function MOUSE_Match(b)return mouse.mx > b.x and mouse.mx < b.x+b.w and mouse.my > b.y + b.mouse_offs_y and mouse.my < b.y+b.mouse_offs_y+b.h end 
@@ -340,6 +384,7 @@
         table.insert(playlist, drag_id_dest, entry)
         drag_id_src, drag_id_dest = nil, nil 
         OBJ_define()
+        OBJ_Update()
         redraw = 1
       end
       
@@ -369,6 +414,7 @@
      elseif st_wind == 2 then
       ExtState_Save()      
     end
+    OBJ_Update()
     GUI_draw()
     MOUSE()
     if gfx.getchar() >= 0 then defer(run) else atexit(gfx.quit) end
@@ -392,7 +438,8 @@
   end
   ---------------------------------------------------
   ExtState_Load()  
-  gfx.init('MPL ProjectPlaylist',conf.wind_w, conf.wind_h, conf.dock, conf.wind_x, conf.wind_y)
+  gfx.init('MPL ProjectPlaylist '..vrs,conf.wind_w, conf.wind_h, conf.dock, conf.wind_x, conf.wind_y)
+  Actions_AddOpenedProjectsToPlaylist()
   OBJ_define()
   GUI_define()
   run()
