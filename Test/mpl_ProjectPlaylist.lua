@@ -1,18 +1,11 @@
--- @version 0.20
+-- @version 0.25
 -- @author MPL
 -- @changelog
---    progress bar
---    active state
---    playing state
---    clickable play buttons
---    dragndrop
---    redraw background/static buttons fix
---    small menu button
---    add current opened projects at startup
+--    # redraw and update playlist if project closed manually
 -- @description ProjectPlaylist
 -- @website http://forum.cockos.com/member.php?u=70694
   
-  --[[ changelog
+  --[[ full changelog
     0.02 init alpha 01.07.2017  
       basic GUI
       load current opened project on start 
@@ -20,7 +13,7 @@
       selecting tabs
       objects init/update improvements
       dragndrop project in list
-    0.20 02.07.2017
+    0.25 02.07.2017
       progress bar
       active state
       clickable play buttons
@@ -28,6 +21,7 @@
       redraw background/static buttons fix
       small menu button
       limit playing progress to end of every project
+      redraw and update playlist if project closed manually
   ]]
   
   
@@ -37,7 +31,7 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.20
+  local vrs = 0.25
   debug = 0
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'
@@ -318,7 +312,7 @@
                 func = function() Menu() end}
                 
     for i = 1, #playlist do
-      if playlist[i].ptr then 
+      if ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) then 
         obj['PLitem_play_'..i] = {x = 0,
                          y = obj.it_h*(i-1),
                          w = obj.proj_playb_w,
@@ -358,8 +352,16 @@
     obj.scrollbar.h = (gfx.h-obj.menu_b_h) * lim( gfx.h/obj.blit_h , 0, 1)
     obj.scrollbar.y = obj.menu_b_h +  obj.blit_offs * ((gfx.h-obj.menu_b_h) - obj.scrollbar.h)
     
+    for i = #playlist , 1, -1 do 
+      if not ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) then
+        obj['PLitem_'..i] = nil
+        table.remove(playlist, i)
+        redraw =1
+      end
+    end
+          
     for i = 1, #playlist do 
-      if playlist[i].ptr and obj['PLitem_'..i] then 
+      if  ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) and obj['PLitem_'..i] then 
         obj['PLitem_'..i].w = gfx.w-obj.proj_playb_w-obj.scrollbar_w
         obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
         obj['PLitem_'..i].mouse_offs_y = -lim(obj.it_h * #playlist - gfx.h, 0, gfx.h) * obj.blit_offs
