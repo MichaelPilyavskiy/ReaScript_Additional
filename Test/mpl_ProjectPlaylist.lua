@@ -1,4 +1,4 @@
--- @version 0.30
+-- @version 0.40
 -- @author MPL
 -- @changelog
 --    # different fixes and improvements, see changelog
@@ -37,17 +37,41 @@
       left aligned tab names
       order numbers
       refresh playlist
+    0.4
+      take out play state buttons
+      take out gradient
+      take out menu
+      right click run menu
+      item separators
+      item state: the play cursor while playing and the Edit cursor while Stopped
+      cycle arrows
+      user input on save
+      reload list after save optionally
+      save/load playlists with .rpl extension
   ]]
   
-  for key in pairs(reaper) do _G[key]=reaper[key]  end  
   
+  
+  
+  
+  
+  
+  
+  for key in pairs(reaper) do _G[key]=reaper[key]  end   
+  local item_height = 20
   local global_font_size = 14
   local global_font_name = 'Arial'
   local max_proj_cnt = 50
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'  
   
+   
+  
+  
+  
+  
+  
   --  INIT -------------------------------------------------  
-  local vrs = 0.30
+  local vrs = 0.40
   debug = 0
   local mouse = {}
   local gui -- see GUI_define()
@@ -74,17 +98,27 @@
   ---------------------------------------------------
   local function col(col_s, a) gfx.set( table.unpack(gui.col[col_s])) if a then gfx.a = a end  end
   ---------------------------------------------------
-  local function GUI_DrawObj(o) 
+  local function GUI_DrawObj(o)
+    if not o then return end 
     local x,y,w,h, txt = o.x, o.y, o.w, o.h, o.txt
     gfx.a = o.a or 0.3
-    gfx.blit( 2, 1, math.rad(o.grad_blit_rot), -- grad back
+    --[[gfx.blit( 2, 1, math.rad(o.grad_blit_rot), -- grad back
               0,0,  obj.grad_sz,math.ceil(obj.grad_sz*o.grad_blit_h_coeff),
-              x,y,w,h, 0,0)
+              x,y,w,h, 0,0)]]
+      gfx.a = 0.05
+      gfx.rect(x,y,w,h, 1)
+      
+    -- separator         
+      col('white', 0.3)
+      gfx.line(x,y+h,x+w,y+h)
+              
+              
     local flag = ''
     local fontsz_add = 0
+    
     if o.active  then  
-      col('white', 0.3)
-      gfx.rect(x,y,w,h,1) 
+      col('white', 0.45)
+      gfx.rect(x,y+1,w,h-1,1) 
       flag = string.byte("b",1)   
       fontsz_add = 2   
     end
@@ -115,6 +149,7 @@
     if drag_id_dest and drag_id_src and drag_id_dest ~= drag_id_src then 
      local add
      if drag_id_dest > drag_id_src then add = 0 else add =1 end
+     gfx.a = 1
      gfx.line(0,obj.it_h*(drag_id_dest-add),
               gfx.w, obj.it_h*(drag_id_dest-add)
                )
@@ -135,7 +170,7 @@
         gfx.dest = 2
         gfx.setimgdim(2, -1, -1)  
         gfx.setimgdim(2, obj.grad_sz,obj.grad_sz)  
-        local r,g,b,a = 0.9,0.9,1,0.65
+        --[[local r,g,b,a = 0.9,0.9,1,0.65
         gfx.x, gfx.y = 0,0
         local c = 0.5
         local drdx = c*0.00001
@@ -149,7 +184,7 @@
         gfx.gradrect(0,0, obj.grad_sz,obj.grad_sz, 
                         r,g,b,a, 
                         drdx, dgdx, dbdx, dadx, 
-                        drdy, dgdy, dbdy, dady) 
+                        drdy, dgdy, dbdy, dady) ]]
         -- refresh backgroung
           gfx.dest = 1
           gfx.setimgdim(1, -1, -1)  
@@ -250,7 +285,7 @@
                 func =  function()  
                           local ret =  MB( 'Are you sure you want to close ALL project tabs?', 'MPL ProjectPlaylist', 4 )
                           if ret == 6 then 
-                            local r, fn = GetUserFileNameForRead('', 'Open ProjectPlaylist', 'txt' )
+                            local r, fn = GetUserFileNameForRead('', 'Open ProjectPlaylist', 'rpl' )
                             if not r then return end 
                             local f = io.open(fn, 'r')
                             if not f then return end
@@ -286,12 +321,39 @@
                 func =  function()  
                           local out_str = ''
                           RecursiveCreateDirectory( playlists_path, 0 )
-                          local fp = playlists_path..'playlist'..os.date():gsub('%:', '-')..'.txt'
-                          for i = 1, #playlist do out_str = out_str..playlist[i].path..'\n' end                          
-                          local f = io.open(fp, 'w')                          
-                          f:write(out_str)
-                          f:close()
-                          playlist.fn = fp
+                          r, UI = GetUserInputs('Save playlist', 1, 'new name', 'playlist')
+                          if r then 
+                            local fp = playlists_path..UI..' - '..os.date():gsub('%:', '-')..'.rpl'
+                            for i = 1, #playlist do out_str = out_str..playlist[i].path..'\n' end                          
+                            local f = io.open(fp, 'w')                          
+                            f:write(out_str)
+                            f:close()
+                            playlist.fn = fp
+                            r2 = MB( 'Reload playlist?', '', 4 )
+                            if r2 then 
+                              playlist = {}                             
+                              
+                              local f = io.open(fp, 'r')
+                              if not f then return end
+                              local context = f:read('a')
+                              f:close()
+                              local t = {}
+                              Main_OnCommand(40886,0) -- File: Close all projects
+                              playlist = {fn = fp}
+                              for line in context:gmatch('[^\r\n]+') do 
+                                Main_OnCommand(41929, 0 ) -- New project tab (ignore default template)
+                                Main_openProject( line )
+                                local retval=  EnumProjects( -1, '' )
+                                playlist[#playlist+1] = {path = line,
+                                                          ptr = retval} 
+                              end
+                              SelectProjectInstance( EnumProjects( 0, '') )
+                              Main_OnCommand(40860,0) -- Close current project tab
+                              redraw = 1
+                              OBJ_define()                           
+                            
+                            end
+                          end
                         end
                 },
               { txt = '|Open /REAPER/MPL ProjectPlaylist path',
@@ -319,15 +381,15 @@
   function OBJ_define()  
     obj.offs = 2
     obj.menu_b_h = 15
-    obj.it_h = 25
+    obj.it_h = item_height
     obj.grad_sz = 300 -- gradient rect
     obj.proj_playb_w = 20
     obj.scrollbar_w = 10
     
     obj.scrollbar = {x = gfx.w-obj.scrollbar_w,
-                y = obj.menu_b_h,
+                y = 0,--obj.menu_b_h,
                 w= obj.scrollbar_w,
-                h =gfx.h-obj.menu_b_h,
+                h =gfx.h,---obj.menu_b_h,
                 a = 0.8,
                 grad_blit_h_coeff = 1,
                 grad_blit_rot = 0,
@@ -335,7 +397,7 @@
                 draw_dyn = true}    
                                
                     
-    obj.menu = {x = gfx.w-obj.scrollbar_w,
+    --[[obj.menu = {x = gfx.w-obj.scrollbar_w,
                 y = 0,
                 w= obj.scrollbar_w,
                 h = obj.menu_b_h,
@@ -343,11 +405,11 @@
                 grad_blit_h_coeff = 1,
                 grad_blit_rot = 0,
                 txt = 'M',
-                func = function() Menu() end}
+                func = function() Menu() end}]]
                 
     for i = 1, #playlist do
       if ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) then 
-        obj['PLitem_play_'..i] = {x = 0,
+        --[[obj['PLitem_play_'..i] = {x = 0,
                          y = obj.it_h*(i-1),
                          w = obj.proj_playb_w,
                          h = obj.it_h,
@@ -359,11 +421,11 @@
                                   local state = GetPlayStateEx( playlist[i].ptr ) == 1                   
                                   if state then OnStopButtonEx( playlist[i].ptr  )
                                    else OnPlayButtonEx( playlist[i].ptr ) end
-                                end}      
+                                end}   ]]   
         if not playlist[i].ID then playlist[i].ID = 0 end
-        obj['PLitem_'..i] = {x = obj.proj_playb_w,
+        obj['PLitem_'..i] = {x = -1,--obj.proj_playb_w,
                          y = obj.it_h*(i-1),
-                         w = gfx.w-obj.proj_playb_w-obj.scrollbar_w,
+                         w = gfx.w-obj.scrollbar_w,---obj.proj_playb_w,
                          h = obj.it_h,
                          txt = playlist[i].ID..'. '..GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
                          a = 1,
@@ -390,9 +452,10 @@
     obj.blit_h = obj.it_h * #playlist
     
     obj.scrollbar.x = gfx.w-obj.scrollbar_w
-    obj.scrollbar.h = (gfx.h-obj.menu_b_h ) * lim( gfx.h/obj.blit_h , 0, 1)
-    obj.scrollbar.y = obj.menu_b_h +  obj.blit_offs * ((gfx.h-obj.menu_b_h) - obj.scrollbar.h)
-    obj.menu.x = gfx.w-obj.scrollbar_w
+    obj.scrollbar.h = gfx.h * lim( gfx.h/obj.blit_h , 0, 1)
+    --(gfx.h-obj.menu_b_h ) * lim( gfx.h/obj.blit_h , 0, 1)
+    obj.scrollbar.y = obj.blit_offs * (gfx.h - obj.scrollbar.h)
+    --obj.menu.x = gfx.w-obj.scrollbar_w
     
     for i = #playlist , 1, -1 do 
       if not ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) then
@@ -404,19 +467,23 @@
           
     for i = 1, #playlist do 
       if  ValidatePtr2( nil, playlist[i].ptr, 'ReaProject*' ) and obj['PLitem_'..i] then 
-        obj['PLitem_'..i].w = gfx.w-obj.proj_playb_w-obj.scrollbar_w
+        obj['PLitem_'..i].w = gfx.w-obj.scrollbar_w--obj.proj_playb_w
         obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
         if obj['PLitem_'..i].active then
           obj.active_item = i
         end
         obj['PLitem_'..i].playstate = GetPlayStateEx( playlist[i].ptr ) == 1
         obj['PLitem_'..i].mouse_offs_y = -lim(obj.it_h * #playlist - gfx.h, 0, gfx.h) * obj.blit_offs
-        obj['PLitem_play_'..i].mouse_offs_y = obj['PLitem_'..i].mouse_offs_y
+        --[[obj['PLitem_play_'..i].mouse_offs_y = obj['PLitem_'..i].mouse_offs_y
         if GetPlayStateEx( playlist[i].ptr ) == 1 then obj['PLitem_play_'..i].txt = '>'
-         else obj['PLitem_play_'..i].txt = '|'  end
+         else obj['PLitem_play_'..i].txt = '|'  end]]
         if GetProjectLength( playlist[i].ptr ) > 0 then 
-          obj['PLitem_'..i].progress =   
-            lim(GetPlayPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ),0,1) end
+          if GetPlayStateEx( playlist[i].ptr ) == 1 then 
+            obj['PLitem_'..i].progress = lim(GetPlayPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ),0,1) 
+           else
+            obj['PLitem_'..i].progress = lim( GetCursorPositionEx( playlist[i].ptr ) / GetProjectLength( playlist[i].ptr ),0,1) 
+          end
+        end
       end  
     end
   end
@@ -493,6 +560,9 @@
       
       if mouse.wheel_trig then obj.blit_offs = lim(obj.blit_offs - mouse.wheel_trig/1200, 0,1) end
     if mouse.LMB_state and MOUSE_Match({x=0,y=0,w=gfx.w,h=gfx.h}) then OBJ_Update() redraw = 1 end
+    
+    if not mouse.last_RMB_state and mouse.RMB_state then Menu() end
+    
     -- mouse release    
       last_drag_mode = drag_mode
       if mouse.last_LMB_state and not mouse.LMB_state   then  mouse.context_latch = '' end
@@ -507,7 +577,8 @@
   ---------------------------------------------------
   local function Actions_Shift_Tab(add)
     if not obj.active_item then return end
-    local id = lim(obj.active_item + add , 1, #playlist)
+    local id = obj.active_item + add , 1, #playlist
+    if id < 1 then id = #playlist elseif id > #playlist then id = 1 end
     if playlist[id] then SelectProjectInstance( playlist[id].ptr ) end
   end
   ---------------------------------------------------
@@ -520,6 +591,7 @@
      elseif   chr == 30064  then Actions_Shift_Tab(-1)
      elseif   chr == 1685026670  then Actions_Shift_Tab(1)
      elseif   chr == 32 and mouse.Shift_state then Actions_StopAllTabs()
+     elseif   char == 102 then Main_OnCommand(ReverseNamedCommandLookup('BR_FOCUS_ARRANGE_WND'),0)-- SWS/S&M: Focus main window (close others)
     end
   end
   ---------------------------------------------------
@@ -541,6 +613,7 @@
     GUI_draw()
     MOUSE()
      chr = gfx.getchar()
+     chr_ms = gfx.mouse_cap
     SHORTCUTS(chr)
     if  chr>= 0 then defer(run) else atexit(gfx.quit) end
   end
