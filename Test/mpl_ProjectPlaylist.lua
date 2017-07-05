@@ -1,4 +1,4 @@
--- @version 0.40
+-- @version 0.50
 -- @author MPL
 -- @changelog
 --    # different fixes and improvements, see changelog
@@ -48,6 +48,13 @@
       user input on save
       reload list after save optionally
       save/load playlists with .rpl extension
+    0.50
+      Prefix - Weekday MM DD HH-MM-SS YYYY.RPL
+      shortcuts : esc for exit
+      shortcuts : Shift+Alt+K for exit
+      shortcuts : tab to focus arrange
+      shift blit if active tab out of window  
+      keep ID order
   ]]
   
   
@@ -61,7 +68,7 @@
   local item_height = 20
   local global_font_size = 14
   local global_font_name = 'Arial'
-  local max_proj_cnt = 50
+  local max_proj_cnt = 100
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'  
   
    
@@ -71,7 +78,7 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.40
+  local vrs = 0.50
   debug = 0
   local mouse = {}
   local gui -- see GUI_define()
@@ -323,14 +330,16 @@
                           RecursiveCreateDirectory( playlists_path, 0 )
                           r, UI = GetUserInputs('Save playlist', 1, 'new name', 'playlist')
                           if r then 
-                            local fp = playlists_path..UI..' - '..os.date():gsub('%:', '-')..'.rpl'
+                            local timest = os.date():gsub('%:', '-')
+                            timest = os.date('%Y-%m-%d - %H-%M-%S')
+                            local fp = playlists_path..UI..' - '..timest..'.rpl'
                             for i = 1, #playlist do out_str = out_str..playlist[i].path..'\n' end                          
                             local f = io.open(fp, 'w')                          
                             f:write(out_str)
                             f:close()
                             playlist.fn = fp
                             r2 = MB( 'Reload playlist?', '', 4 )
-                            if r2 then 
+                            if r2 == 5 then 
                               playlist = {}                             
                               
                               local f = io.open(fp, 'r')
@@ -427,7 +436,7 @@
                          y = obj.it_h*(i-1),
                          w = gfx.w-obj.scrollbar_w,---obj.proj_playb_w,
                          h = obj.it_h,
-                         txt = playlist[i].ID..'. '..GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
+                         txt = i..'. '..GetProjectName( playlist[i].ptr, '' ):sub(0,-5),
                          a = 1,
                          leftaligned = true,
                          grad_blit_h_coeff = 0.3,
@@ -471,6 +480,7 @@
         obj['PLitem_'..i].active = EnumProjects( -1, '' ) == playlist[i].ptr
         if obj['PLitem_'..i].active then
           obj.active_item = i
+          
         end
         obj['PLitem_'..i].playstate = GetPlayStateEx( playlist[i].ptr ) == 1
         obj['PLitem_'..i].mouse_offs_y = -lim(obj.it_h * #playlist - gfx.h, 0, gfx.h) * obj.blit_offs
@@ -486,6 +496,25 @@
         end
       end  
     end
+    
+    if obj.last_active_item and obj.active_item and obj.active_item ~= obj.last_active_item then 
+      shift_to_tab = true
+    end
+    
+    if shift_to_tab then
+      if obj['PLitem_'..obj.active_item].y+obj['PLitem_'..obj.active_item].mouse_offs_y  > gfx.h - obj.it_h  then  
+        obj.blit_offs = lim(obj.blit_offs + 0.08, 0, 1)
+        redraw = 1
+       elseif obj['PLitem_'..obj.active_item].y+obj['PLitem_'..obj.active_item].mouse_offs_y  < 0  then 
+        obj.blit_offs = lim(obj.blit_offs - 0.08, 0, 1)
+        redraw = 1
+       else
+        shift_to_tab = false
+      end
+    end
+    
+    obj.last_active_item = obj.active_item
+    
   end
  ---------------------------------------------------
   local function MOUSE_Match(b) 
@@ -591,7 +620,7 @@
      elseif   chr == 30064  then Actions_Shift_Tab(-1)
      elseif   chr == 1685026670  then Actions_Shift_Tab(1)
      elseif   chr == 32 and mouse.Shift_state then Actions_StopAllTabs()
-     elseif   char == 102 then Main_OnCommand(ReverseNamedCommandLookup('BR_FOCUS_ARRANGE_WND'),0)-- SWS/S&M: Focus main window (close others)
+     elseif   chr == 9 then Main_OnCommand(NamedCommandLookup('_BR_FOCUS_ARRANGE_WND'), 0)-- SWS/S&M: Focus main window (close others)
     end
   end
   ---------------------------------------------------
@@ -609,13 +638,17 @@
      elseif st_wind == 2 then
       ExtState_Save()      
     end
+    
+    
     OBJ_Update()
     GUI_draw()
     MOUSE()
      chr = gfx.getchar()
      chr_ms = gfx.mouse_cap
     SHORTCUTS(chr)
-    if  chr>= 0 then defer(run) else atexit(gfx.quit) end
+    if  chr>= 0 
+      and chr ~= 27 
+      and not (chr == 331 and chr_ms == 24)  then defer(run) else atexit(gfx.quit) end
   end
   ---------------------------------------------------
   local function GUI_define()
