@@ -1,4 +1,4 @@
--- @version 0.50
+-- @version 0.60
 -- @author MPL
 -- @changelog
 --    # different fixes and improvements, see changelog
@@ -55,6 +55,9 @@
       shortcuts : tab to focus arrange
       shift blit if active tab out of window  
       keep ID order
+    0.60
+      Menu: toggle dock
+      take gradient back
   ]]
   
   
@@ -66,7 +69,7 @@
   
   for key in pairs(reaper) do _G[key]=reaper[key]  end   
   local item_height = 20
-  local global_font_size = 14
+  local global_font_size = 16
   local global_font_name = 'Arial'
   local max_proj_cnt = 100
   local playlists_path = GetResourcePath()..'/MPL ProjectPlaylists/'  
@@ -78,7 +81,7 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.50
+  local vrs = 0.60
   debug = 0
   local mouse = {}
   local gui -- see GUI_define()
@@ -108,12 +111,12 @@
   local function GUI_DrawObj(o)
     if not o then return end 
     local x,y,w,h, txt = o.x, o.y, o.w, o.h, o.txt
-    gfx.a = o.a or 0.3
-    --[[gfx.blit( 2, 1, math.rad(o.grad_blit_rot), -- grad back
-              0,0,  obj.grad_sz,math.ceil(obj.grad_sz*o.grad_blit_h_coeff),
-              x,y,w,h, 0,0)]]
-      gfx.a = 0.05
-      gfx.rect(x,y,w,h, 1)
+    
+    -- gradient back
+      gfx.a = o.a or 0.3
+      gfx.blit( 2, 1, math.rad(o.grad_blit_rot),
+                0,0,  obj.grad_sz,math.ceil(obj.grad_sz*o.grad_blit_h_coeff),
+                x,y,w,h, 0,0)
       
     -- separator         
       col('white', 0.3)
@@ -123,28 +126,31 @@
     local flag = ''
     local fontsz_add = 0
     
-    if o.active  then  
-      col('white', 0.45)
-      gfx.rect(x,y+1,w,h-1,1) 
-      flag = string.byte("b",1)   
-      fontsz_add = 2   
-    end
+    -- selection active tab
+      if o.active  then  
+        col('white', 0.45)
+        gfx.rect(x,y+1,w,h-1,1) 
+        flag = string.byte("b",1)   
+        fontsz_add = 2   
+      end
     
     -- progress      
       if o.progress then 
         col('green', 0.43) 
         gfx.rect(x,y+h-2,w*o.progress,2,0)
-      end     
- 
-    col('white', 0.8)
-    if o.playstate then col('green', 0.7)  end
+      end    
+       
+    -- font on play
+      col('white', 0.8)
+      if o.playstate then col('green', 0.7)  end
     
-    gfx.setfont(1, gui.fontname, gui.fontsz + fontsz_add, flag  )
-    local x_offs = 5
-    gfx.x = x + (w-gfx.measurestr(txt))/2
-    if o.leftaligned then gfx.x = x + x_offs end
-    gfx.y = y+ (h-gfx.texth)/2
-    gfx.drawstr(o.txt)
+    -- text
+      gfx.setfont(1, gui.fontname, gui.fontsz + fontsz_add, flag  )
+      local x_offs = 5
+      gfx.x = x + (w-gfx.measurestr(txt))/2
+      if o.leftaligned then gfx.x = x + x_offs end
+      gfx.y = y+ (h-gfx.texth)/2
+      gfx.drawstr(o.txt)
   end
   ---------------------------------------------------
   local function GUI_Playlist()
@@ -177,7 +183,7 @@
         gfx.dest = 2
         gfx.setimgdim(2, -1, -1)  
         gfx.setimgdim(2, obj.grad_sz,obj.grad_sz)  
-        --[[local r,g,b,a = 0.9,0.9,1,0.65
+        local r,g,b,a = 0.9,0.9,1,0.62
         gfx.x, gfx.y = 0,0
         local c = 0.5
         local drdx = c*0.00001
@@ -191,7 +197,7 @@
         gfx.gradrect(0,0, obj.grad_sz,obj.grad_sz, 
                         r,g,b,a, 
                         drdx, dgdx, dbdx, dadx, 
-                        drdy, dgdy, dbdy, dady) ]]
+                        drdy, dgdy, dbdy, dady) 
         -- refresh backgroung
           gfx.dest = 1
           gfx.setimgdim(1, -1, -1)  
@@ -379,7 +385,13 @@
                           redraw = 1
                           OBJ_define()
                         end
-              }            
+              }   ,
+              { txt = '|Toggle dock window',
+                func =  function()  
+                          dock_state = gfx.dock(-1)
+                          gfx.dock(math.abs(1-dock_state))
+                        end
+              }                        
             }
     local str = ""
     for i = 1, #str_t do str = str..str_t[i].txt end
@@ -621,6 +633,8 @@
      elseif   chr == 1685026670  then Actions_Shift_Tab(1)
      elseif   chr == 32 and mouse.Shift_state then Actions_StopAllTabs()
      elseif   chr == 9 then Main_OnCommand(NamedCommandLookup('_BR_FOCUS_ARRANGE_WND'), 0)-- SWS/S&M: Focus main window (close others)
+     elseif   chr == 019 then reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_PROJLISTSAVE'),0)-- SWS/S&M: Save List of Open Project 
+     elseif   chr == 015 then reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_PROJLISTSOPEN'),0)-- SWS/S&M: Open Projects from List  
     end
   end
   ---------------------------------------------------
