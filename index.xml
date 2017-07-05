@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="8fc1e94dfde3a85a8b66424be0232c3f687908ad" name="MPL_Test">
+<index version="1" commit="dd5ceba0a4a75f0f98e1af9b95f47aba881e7731" name="MPL_Test">
   <category name="Test">
     <reapack name="mpl_ProjectPlaylist.lua" type="script" desc="ProjectPlaylist">
       <metadata>
@@ -43,6 +43,10 @@ add current opened projects at startup]]></changelog>
       <version name="0.40" author="MPL" time="2017-07-04T20:33:19Z">
         <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/8fc1e94dfde3a85a8b66424be0232c3f687908ad/Test/mpl_ProjectPlaylist.lua</source>
+      </version>
+      <version name="0.50" author="MPL" time="2017-07-05T18:38:38Z">
+        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/dd5ceba0a4a75f0f98e1af9b95f47aba881e7731/Test/mpl_ProjectPlaylist.lua</source>
       </version>
     </reapack>
   </category>
