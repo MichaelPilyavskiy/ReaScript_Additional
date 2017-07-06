@@ -1,4 +1,4 @@
--- @version 0.60
+-- @version 0.61
 -- @author MPL
 -- @changelog
 --    # different fixes and improvements, see changelog
@@ -58,6 +58,8 @@
     0.60
       Menu: toggle dock
       take gradient back
+    0.61
+      force reload after SWS save test
   ]]
   
   
@@ -81,7 +83,7 @@
   
   
   --  INIT -------------------------------------------------  
-  local vrs = 0.60
+  local vrs = 0.61
   debug = 0
   local mouse = {}
   local gui -- see GUI_define()
@@ -274,6 +276,31 @@
       playlist[#playlist+1] = {ptr = retval, path = projfn, ID = i}
     end  
   end
+  ---------------------------------------------------
+  local function Actions_ReloadPlaylist(fp)
+    if not fp and not playlist.fn then return end
+    if not fp then fp = playlist.fn end
+    if not tp then return end
+    playlist = {}  
+    local f = io.open(fp, 'r')
+    if not f then return end
+    local context = f:read('a')
+    f:close()
+    local t = {}
+    Main_OnCommand(40886,0) -- File: Close all projects
+    playlist = {fn = fp}
+    for line in context:gmatch('[^\r\n]+') do 
+      Main_OnCommand(41929, 0 ) -- New project tab (ignore default template)
+      Main_openProject( line )
+      local retval=  EnumProjects( -1, '' )
+      playlist[#playlist+1] = {path = line,
+                                ptr = retval} 
+    end
+    SelectProjectInstance( EnumProjects( 0, '') )
+    Main_OnCommand(40860,0) -- Close current project tab
+    redraw = 1
+    OBJ_define()  
+  end
   ---------------------------------------------------  
   function Menu()
     gfx.x, gfx.y = mouse.mx, mouse.my  
@@ -346,27 +373,7 @@
                             playlist.fn = fp
                             r2 = MB( 'Reload playlist?', '', 4 )
                             if r2 == 5 then 
-                              playlist = {}                             
-                              
-                              local f = io.open(fp, 'r')
-                              if not f then return end
-                              local context = f:read('a')
-                              f:close()
-                              local t = {}
-                              Main_OnCommand(40886,0) -- File: Close all projects
-                              playlist = {fn = fp}
-                              for line in context:gmatch('[^\r\n]+') do 
-                                Main_OnCommand(41929, 0 ) -- New project tab (ignore default template)
-                                Main_openProject( line )
-                                local retval=  EnumProjects( -1, '' )
-                                playlist[#playlist+1] = {path = line,
-                                                          ptr = retval} 
-                              end
-                              SelectProjectInstance( EnumProjects( 0, '') )
-                              Main_OnCommand(40860,0) -- Close current project tab
-                              redraw = 1
-                              OBJ_define()                           
-                            
+                              Actions_ReloadPlaylist(fp)                            
                             end
                           end
                         end
@@ -633,7 +640,9 @@
      elseif   chr == 1685026670  then Actions_Shift_Tab(1)
      elseif   chr == 32 and mouse.Shift_state then Actions_StopAllTabs()
      elseif   chr == 9 then Main_OnCommand(NamedCommandLookup('_BR_FOCUS_ARRANGE_WND'), 0)-- SWS/S&M: Focus main window (close others)
-     elseif   chr == 019 then reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_PROJLISTSAVE'),0)-- SWS/S&M: Save List of Open Project 
+     elseif   chr == 019 then 
+      reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_PROJLISTSAVE'),0)-- SWS/S&M: Save List of Open Project 
+      Actions_ReloadPlaylist()
      elseif   chr == 015 then reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_PROJLISTSOPEN'),0)-- SWS/S&M: Open Projects from List  
     end
   end
