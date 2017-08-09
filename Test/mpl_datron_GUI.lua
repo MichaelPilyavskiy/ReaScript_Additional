@@ -1,11 +1,23 @@
   name = 'DatronGUI'
-  vrs = '2.13'
+  vrs = '2.20'
   --local data = {}
   local obj = {}
   local mouse = {}
   --skip_check = true
   
     --[[  
+      - 2.20  09/08/2017
+        + arum IDs
+        + arumlog
+        + arum file shed
+      - 2.17  22/07/2017
+        # fix ID parser for 6digit IDs
+      - 2.16  20/07/2017
+        proper time string for admin
+      - 2.15  17.07.2017
+        # fix error 700
+      - 2.14  13.07.2017
+        execute HyperDent after search unchecked
       - 2.13  08.07.2017
         Action_RenderFromOperation
       - 2.12  23.06.2017
@@ -68,7 +80,8 @@
           machines = {
                       {path= [=[V:\]=],       name='D1',         offset_sec=700,   bypass = false },  
                       {path= [=[Y:\]=],       name='D2',         offset_sec=550,   bypass = false},
-                      {path= [=[X:\]=],       name='D3',         offset_sec=600,   bypass = false}
+                      {path= [=[X:\]=],       name='D3',         offset_sec=600,   bypass = false},
+                      {path= [=[W:\]=],       name='Arum1',         offset_sec=600,   bypass = false}
                       },
           count_machines = 4,
           log_path = [=[Z:\DATRON\Datron MSK.txt]=],
@@ -80,23 +93,29 @@
           trig_time = 60,-- sec
           coefficient_time = 1.1}
   
-  -- SPB        
-  --[[data = {
-          
-          machines = {
-                      {path= [=[V:\]=],       name='D1',         offset_sec=700,   bypass = false },  
-                      {path= [=[Y:\]=],       name='D2',         offset_sec=450,   bypass = false},
-                      {path= [=[X:\]=],       name='D3',         offset_sec=500,   bypass = false}
-                      },
-          count_machines = 2,                                                           -- count for proper division/mod when counting milled parts with Menu/Get(MM/YYYY)
-          log_path = [=[Z:\DATRON\Datron MSK.txt]=],                                    -- real time state of milling
-          stat_path = [=[Z:\DATRON\Files_STL_Checked\Stat.txt]=]  ,                     -- txt file for checked statistics stored with "set" button
-          stat_path0 = [=[Z:\DATRON\Files_STL_Checked]=]  ,                             -- path for saving files searched with "Search Unchecked"
-          MCR_path = [=[C:\Users\Public\Documents\hyperDENT\NC Output\]=],              -- output of HyperDent MCR/NC files
-          unchecked_path = [=[Z:\files_for_check\Unchecked]=],                          -- unchecked path
-          run_update = true,  
-          trig_time = 60,-- sec
-          coefficient_time = 1.1}        ]]  
+  
+  
+  --[[   ARUM copy file shedule
+  -------------------------------------------------------------
+  time_shed = 180
+  src = 'D:\\DentalCNC_5X200_DC_AIB3.0\\SYSTEM\\ARUMINFO.DAT'
+  dest = 'D:\\USERDATA\\ARUMINFO.DAT'
+  function run()
+    clock = os.clock()
+    if clock%time_shed < 1 then trig = true else trig = false end
+    if last_trig and not trig then 
+      last_clock_st = clock 
+      os.execute('copy '..src..' '..dest)
+    end
+    last_trig = trig
+    reaper.defer(run)
+  end  
+  run()
+  -------------------------------------------------------------
+  ]]
+  
+  
+  
   ----------------------------------------------------------------------          
   function Action_RenderFromOperation()    
     local retval, fp = reaper.GetUserFileNameForRead('', 'Open MCR', '.mcr' )
@@ -225,7 +244,7 @@
                       y = (i-1)*math.floor(gfx.h/#data.machines)+obj.h2, 
                       w = gfx.w-obj.w1-obj.offs,
                       h = math.floor(gfx.h/#data.machines),
-                      txt = 'D'..i,
+                      txt = data.machines[i].name,
                       a_frame = obj.blit_alpha2,
                       a_txt = obj.txt_alpha1,
                       fontname = obj.fontname,
@@ -251,7 +270,7 @@
       end
       file:close()
     end
-    return comtime * data.coefficient_time
+    return math.floor(comtime * data.coefficient_time)
   end
   -------------------------------------------------------------------- 
   function Menu()
@@ -308,8 +327,8 @@
         if file then
           local content = file:read('a')
           for line in content:gmatch('[^\n]+') do
-            if line:find(ID) and (line:find('Start') or line:find('Ende'))   then
-              str = str..'\n'..i..' '..line
+            if line:find(ID) then --and (line:find('Start') or line:find('Ende'))   then
+              str = str..'\n'..data.machines[i].name..' '..line
             end
           end
           file:close()
@@ -489,6 +508,7 @@
       local files_str = ''
       for i = 1, #files do files_str = files_str..'\n'..files[i].file_name end
       reaper.MB(#files..' STL copied: \n'..files_str, 'Add from unchecked', 0)
+      os.execute('start "" "C:/Program Files (x86)/FOLLOW ME/hyperDENT V8.0/win/fmHyperDent.exe"')
   end
   ---------------------------------------------------------------------------      
     function check_NIC(str)
@@ -704,11 +724,14 @@
     local str = ""
     
     for i = 1, #data.machines do   
-      local f = io.open(data.machines[i].path..'/Protokoll.txt', "r")
+    
+    
+      local f = io.open(data.machines[i].path..'/Protokoll.txt', "r")      
+      -- datron
       if f then 
         f:seek("end", -200)
         local text = f:read("*a")
-        if not text then f:close() end
+        if not text then goto skip_text end
         local srch_line
         for line in text:gmatch('[^\r\n]+') do if line:find('Start') or line:find('Ende') then srch_line = line end end        
         if srch_line then
@@ -729,15 +752,50 @@
           if elapsed < 0 then elapsed = 0 end
           if com_time and com_time_TS then obj.but['machine'..i].progress = elapsed/com_time_TS end
           if  obj.but['machine'..i].progress and  obj.but['machine'..i].progress > 1 then  obj.but['machine'..i].progress = 1 end
-          obj.but['machine'..i].txt = 'D'..i..' | '..disk_ID:sub(0,-2)..'\n'..work_ID
+          obj.but['machine'..i].txt = data.machines[i].name..' | '..disk_ID:sub(0,-2)..'\n'..work_ID
           if not is_st then obj.but['machine'..i].progress = nil else obj.but['machine'..i].txt = obj.but['machine'..i].txt..'\n'..os.date("!%X", elapsed )..' / '..com_time  end
-          str = str..'\n'..'D'..i
+          str = str..'\n'..data.machines[i].name
           if not com_time_TS then com_time_TS = 1 end
-          if not obj.but['machine'..i].progress then str = str..'\n'..'Готово: '..work_ID else str = str..'\n'..'Будет готово через '..math.floor( (com_time_TS-elapsed)/60)..' минут: '..work_ID end
+          if not obj.but['machine'..i].progress then str = str..'\n'..'Готово: '..work_ID else
+            local r_h =  math.floor( math.floor( (com_time_TS-elapsed)/60)/60)
+            local r_h_s
+            if r_h ==1 then r_h_s = 'час'
+              elseif r_h >= 2 and r_h <= 4  then r_h_s = 'часа'
+              else r_h_s = 'часов'
+            end
+            local r0 = r_h..' '..r_h_s..' '
+            if r_h == 0 then r0 = '' end
+            local r_m = (math.floor( (com_time_TS-elapsed)/60)%60)
+            local r_m_s
+            if r_m ==1 or (r_m > 20 and r_m % 10 == 1) then r_m_s = 'минуту'
+              elseif (r_m >= 2 and r_m <= 4) or (r_m > 20 and r_m % 10 >= 2 and r_m % 10 <= 4)  then r_m_s = 'минуты'
+              else r_m_s = 'минут'
+            end
+            local m0 = r_m..' '..r_m_s
+            if r_m == 0 then m0 ='' end
+            str = str..'\n'..'Будет готово через '..
+              r0..
+              m0..': '..work_ID end
           str = str..'\n'
         end
-        f:close()
       end
+      ::skip_text::
+     if f then f:close() end      
+     
+     -- arum
+     local f = io.open(data.machines[i].path..'/ARUMINFO.DAT', "r")
+     if f then 
+        local program_name = f:read("*a"):match('USERDATA.*nc'):sub(10)
+        local disk_ID = program_name:match('[%d]+[^%d]+')
+        local work_ID = Get_ID(program_name)
+        obj.but['machine'..i].txt = data.machines[i].name..' | '..disk_ID:sub(0,-2)..'\n'..work_ID
+        str = str..'\n'..data.machines[i].name
+        str = str..'\n'..work_ID
+        
+        WriteArumlog(data.machines[i].path, program_name)
+     end
+     if f then f:close() end      
+     
     end 
     
     --msg(str)
@@ -749,10 +807,32 @@
     update_gfx = true
     trigger_update = nil
   end
+  -------------------------------------------------------------------- 
+  function WriteArumlog(path, program_name)
+    local f = io.open(path..'/Protokoll.txt', "r")
+    if not f then 
+      f = io.open(path..'/Protokoll.txt', "w") 
+      f:write('') 
+      f:close()
+    end
+    
+    local f = io.open(path..'/Protokoll.txt', "r")
+    local context = f:read('a')
+    local t = {}
+    -- get t
+      for line in context:gmatch('[^\r\n]+') do t[#t+1]  = line end
+      if not t[#t] or (t[#t] and not t[#t]:match(program_name)) then 
+        f = io.open(path..'/Protokoll.txt', "a") 
+        f:write('\n'..os.date()..' '..program_name) 
+        f:close() 
+       else
+        f:close()
+      end
+  end
   --------------------------------------------------------------------  
   function Convert_DateToTimestamp(s)
     local p="(%d+).(%d+).(%d+)  (%d+):(%d+):(%d+)"
-    s_day,s_month,s_year,s_hour,s_min,s_sec=s:match(p)    
+    local s_day,s_month,s_year,s_hour,s_min,s_sec=s:match(p)    
     if not (s_day and s_month and s_year and s_hour and s_min and s_sec) then return 100 end
     if tonumber(s_year) < 2017 or tonumber(s_month) > 12 or tonumber(s_hour) > 24 or tonumber(s_day) > 31 or tonumber(s_min) > 60 or tonumber(s_sec ) > 60 then return 100 end
     return os.time({day=s_day,month=s_month,year=s_year,hour=s_hour,min=s_min,sec=s_sec})
@@ -760,23 +840,11 @@
   --------------------------------------------------------------------
   function Get_ID(str)
     if not str then return '' end
-    local ID = str:reverse():match('[^%d]%d%d%d%d%d[^%d]') 
-    if not ID then ID = str:reverse():match('[^%d]%d%d%d%d%d%d[^%d]')  end
+    local ID = str:reverse():match('[^%d]%d%d%d%d%d%d[^%d]') 
+    if not ID then ID = str:reverse():match('[^%d]%d%d%d%d%d[^%d]')  end
     if ID then ID = ID:reverse():sub(2,-2) end
     if not ID then ID = str:reverse():match('%d%d%d%d%d') if ID then ID = ID:reverse() end end
-    --[[
-    local ID = str:reverse():match('%d%d%d%d%d[^%d]')    
-    local ID = str:reverse():match('%d%d_%d%d%d%d%d[^%d]')
-    if not ID then  ID = str:reverse():match('%d_%d%d%d%d%d[^%d]') end
-    if not ID then  ID = str:reverse():match('[^%d]%d%d%d%d%d[^%d]') end
-    if not ID then  ID = str:reverse():match('[^%d]%d%d%d%d[^%d]') end
-    if ID then 
-      ID = ID:reverse() 
-      if ID:find('[%p]') == 1 then ID = ID:sub(2) end
-      if ID:reverse():find('[%p]') == 1 then ID = ID:sub(0,-2) end
-    end]]
     if not ID then  ID = '' end
-    --if ID then ID = ID:reverse():match('[%d]+')
     return ID
   end
   --------------------------------------------------------------------
@@ -843,97 +911,7 @@
         i  = i + 1
       until file_name == nil
     end
-  --------------------------------------------------------------------   
-  function Fill_Header(filename)
-    do return  end
-    if not filename then return end
-    local file = io.open(filename, 'r')
-    if not file then return end
-    if not filename:match('[%d]+[^%d]+') then return end
-    local disk = '(auto)'..filename:match('[%d]+[^%d]+')
-    
-    local disk_diam = disk:match('%d%d')
-    if disk_diam and disk_diam == '13' then disk_diam = 13.5 end
-    
-    local material
-    if filename:lower():find('ti') then material = 'Ti' else material = 'CoCr' end
-    
-    if not (disk and disk_diam and material) then return end 
-    local str_add = 
-[[
-!Makro Datei ; Erzeugt am 18.04.2017 - 12:43 Uhr by hyperDENT!
-!34893
-_sprache 0;
-Dimension 1;
-; !Blankname = "]]..disk..[["!
-; !Material = "]]..material..[["!
-; !Thickness = ]]..disk_diam..[[!
-
-; !Tooltype_1 = "Co Cr Datron Ballnose 3 x 12_Raise"!
-; !Tooltype_10 = "Co Cr Datron Ballmill 1.5 x 12_Raise"!
-; !Tooltype_12 = "Co Cr Datron Ballmill 2 x 12(2)"!
-; !Tooltype_409 = "Titanium Ballmill 1 x 13_Raise"!
-; !Tooltype_51 = "Co Cr Datron endmil 1.8 Yena Long"!
-; !Tooltype_418 = "Co Chr Datron Bullnose 1,5X 8 r 0,1_G"!
-; !Tooltype_436 = "Co Chr Datron Endmill 1,5x3"!
-; !Tooltype_447 = "Co Chr Datron Endmill _015_L"!
-; !Tooltype_473 = "Drill 1,5"!
-; !Tooltype_477 = "Drill 2"!
-
-; !Tooltime_1 = 10!
-; !Tooltime_409 = 10!
-; !Tooltime_10 = 10!
-; !Tooltime_12 = 10!
-; !Tooltime_51 = 10!
-; !Tooltime_418 = 10!
-; !Tooltime_436 = 10!
-; !Tooltime_447 = 10!
-; !Tooltime_473 = 10!
-; !Tooltime_477 = 10!
-
-; !Toolpath_1 = 10!
-; !Toolpath_10 = 10!
-; !Toolpath_12 = 10!
-; !Toolpath_409 = 10!
-; !Toolpath_51 = 10!
-; !Toolpath_418 = 10!
-; !Toolpath_436 = 10!
-; !Toolpath_447 = 10!
-; !Toolpath_473 = 10!
-; !Toolpath_477 = 10!
-
-; !Toolminlen_1 = 64!
-; !Toolminlen_10 = 64!
-; !Toolminlen_12 = 64!
-; !Toolminlen_409 = 64!
-; !Toolminlen_51 = 62!
-; !Toolminlen_418 = 64!
-; !Toolminlen_436 = 64!
-; !Toolminlen_447 = 64!
-; !Toolminlen_473 = 64!
-; !Toolminlen_477 = 64!
-;
-
-]]
-
-    -- check/cnange content
-      local out_content = ''
-      local content = file:read('*all')--(200)
-      if not content:find('Tooltype') then
-        local content_findcut = content:find('Wzpruefen')
-        out_content = str_add..content:sub(content_findcut)
-      end
-      file:close()
-      
-    -- write new content
-      if out_content ~= '' then 
-        file = io.open(filename, 'w')
-        file:write(out_content)
-        file:close()
-        else return false
-      end
-    return true
-  end    
+ 
   --------------------------------------------------------------------     
   function ContentCheck(content)
     local content = content:lower()
@@ -962,6 +940,34 @@ Dimension 1;
     
     return cnt_parts, str
   end
+  -------------------------------------------------------------------- 
+  function Action_GetQuere()
+    reaper.ClearConsole()
+    qt = {}
+    local cur_time = os.time()
+    for i = 1, #data.machines do
+      local shift = 0
+      for f_id = 0, 30 do
+        local fp = reaper.EnumerateFiles( data.machines[i].path, f_id )
+        if not fp then break end
+        if fp:find('mcr') then 
+          shift = shift + F_GetComTime(data.machines[i].path..fp)
+          qt[#qt+1] = { fp=fp, 
+                        time = shift+cur_time, 
+                        time_form = os.date("%X",shift+cur_time),
+                        disk = fp:match('.-%_')}
+          shift = shift + 60*5
+        end        
+      end
+    end
+    
+    --table.sort(qt, function(qt.time, qt.time) return (qt.time)<(qt.time) end)
+    for i =1 , #qt do
+      if qt[i] then
+        msg(qt[i].time_form)
+      end
+    end
+  end
   --------------------------------------------------------------------                              
   
   Objects_Init()
@@ -971,3 +977,4 @@ Dimension 1;
   update_gfx_onstart = true
   trigger_update = true
   Run()
+  --*Action_GetQuere()
