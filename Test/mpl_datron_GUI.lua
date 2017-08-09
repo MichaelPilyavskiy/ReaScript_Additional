@@ -1,15 +1,16 @@
   name = 'DatronGUI'
-  vrs = '2.20'
+  vrs = '2.21'
   --local data = {}
   local obj = {}
   local mouse = {}
   --skip_check = true
   
     --[[  
-      - 2.20  09/08/2017
+      - 2.21  09/08/2017
         + arum IDs
         + arumlog
         + arum file shed
+        + prevent clear Arum log
       - 2.17  22/07/2017
         # fix ID parser for 6digit IDs
       - 2.16  20/07/2017
@@ -78,10 +79,28 @@
   data = {
           
           machines = {
-                      {path= [=[V:\]=],       name='D1',         offset_sec=700,   bypass = false },  
-                      {path= [=[Y:\]=],       name='D2',         offset_sec=550,   bypass = false},
-                      {path= [=[X:\]=],       name='D3',         offset_sec=600,   bypass = false},
-                      {path= [=[W:\]=],       name='Arum1',         offset_sec=600,   bypass = false}
+                      { path= [=[V:\]=],       
+                        name='D1',         
+                        offset_sec=700,   
+                        bypass = false,  
+                        allow_clearing_log = true },  
+                        
+                      { path= [=[Y:\]=],       
+                        name='D2',         
+                        offset_sec=550,   
+                        bypass = false,  
+                        allow_clearing_log = true },
+                        
+                      { path= [=[X:\]=],       
+                        name='D3',         
+                        offset_sec=600,   
+                        bypass = false,  
+                        allow_clearing_log = true },
+                        
+                      { path= [=[W:\]=],       
+                        name='Arum1',         
+                        offset_sec=600,   
+                        bypass = false}
                       },
           count_machines = 4,
           log_path = [=[Z:\DATRON\Datron MSK.txt]=],
@@ -279,7 +298,12 @@
               {name = 'Statistics: get (MM/YYYY)',       func = function () str = Action_ParseStat(nil,nil,true) msg(str) end},
               {name = 'Statistics: Open stat file|', func = function () local cmd = 'start "" "'..data.stat_path..'"'  os.execute(cmd) end},
               {name = 'Log: Search by ID', func = function () Action_SearchLogsByID()  end},
-              {name = 'Log: Clear all|', func = function () for i = 1, #data.machines do Action_Clear_Logs(data.machines[i].path..'Protokoll.txt') end end},
+              {name = 'Log: Clear all|', func = function () 
+                                                  for i = 1, #data.machines do 
+                                                    if data.machines[i].allow_clearing_log then
+                                                      Action_Clear_Logs(data.machines[i].path..'Protokoll.txt') 
+                                                    end
+                                                  end end},
               {name = 'Render MCR from custom operation number|', func = function () Action_RenderFromOperation()  end},
               
               {name = 'Open current administrator file', func = function () local cmd = 'start "" "'..data.log_path..'"'  os.execute(cmd)  end}
@@ -792,7 +816,8 @@
         str = str..'\n'..data.machines[i].name
         str = str..'\n'..work_ID
         
-        WriteArumlog(data.machines[i].path, program_name)
+        local log_pre_lastLine = Arum_Writelog(data.machines[i].path, program_name)
+        Arum_RemoveLastProgram(data.machines[i].path, log_pre_lastLine)
      end
      if f then f:close() end      
      
@@ -808,14 +833,25 @@
     trigger_update = nil
   end
   -------------------------------------------------------------------- 
-  function WriteArumlog(path, program_name)
+  function Arum_RemoveLastProgram(path, log_pre_lastLine)
+    if not log_pre_lastLine or log_pre_lastLine == '' then return end
+    local filename = log_pre_lastLine:sub(21)
+    local src = path..filename
+    local dest = path..'archive\\'..filename
+    local f = io.open(src, 'r')
+    if f then 
+      f:close() 
+      reaper.ExecProcess('powershell -Command Move-Item '..src..' '..dest, 0)
+    end
+  end
+  -------------------------------------------------------------------- 
+  function Arum_Writelog(path, program_name)
     local f = io.open(path..'/Protokoll.txt', "r")
     if not f then 
       f = io.open(path..'/Protokoll.txt', "w") 
       f:write('') 
       f:close()
-    end
-    
+    end    
     local f = io.open(path..'/Protokoll.txt', "r")
     local context = f:read('a')
     local t = {}
@@ -823,11 +859,12 @@
       for line in context:gmatch('[^\r\n]+') do t[#t+1]  = line end
       if not t[#t] or (t[#t] and not t[#t]:match(program_name)) then 
         f = io.open(path..'/Protokoll.txt', "a") 
-        f:write('\n'..os.date()..' '..program_name) 
+        f:write(os.date()..' '..program_name..'\n') 
         f:close() 
        else
         f:close()
       end
+    if #t>1 then return t[#t-1] end
   end
   --------------------------------------------------------------------  
   function Convert_DateToTimestamp(s)
