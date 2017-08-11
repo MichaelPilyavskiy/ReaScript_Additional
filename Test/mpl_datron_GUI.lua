@@ -1,11 +1,18 @@
   name = 'DatronGUI'
-  vrs = '2.21'
+  vrs = '2.22'
   --local data = {}
   local obj = {}
   local mouse = {}
   --skip_check = true
   
     --[[  
+      - 2.22  11/08/2017
+        + write com time to MCR/NC when rename
+        + Parse com time from "Total machininhg time"
+        + Arum progress
+        + Arum remaining time
+        # fix Convert_DateToTimestamp (empty (#s+) as dummy variable)
+        # Data_Update clear
       - 2.21  09/08/2017
         + arum IDs
         + arumlog
@@ -81,26 +88,31 @@
           machines = {
                       { path= [=[V:\]=],       
                         name='D1',         
-                        offset_sec=700,   
+                        offset_sec=800,   
                         bypass = false,  
-                        allow_clearing_log = true },  
+                        machine_type = 'Datron',
+                        coefficient_time = 1.1 },  
                         
                       { path= [=[Y:\]=],       
                         name='D2',         
                         offset_sec=550,   
                         bypass = false,  
-                        allow_clearing_log = true },
+                        machine_type = 'Datron',
+                        coefficient_time = 1.1 }, 
                         
                       { path= [=[X:\]=],       
                         name='D3',         
                         offset_sec=600,   
                         bypass = false,  
-                        allow_clearing_log = true },
+                        machine_type = 'Datron',
+                        coefficient_time = 1.1 }, 
                         
                       { path= [=[W:\]=],       
                         name='Arum1',         
-                        offset_sec=600,   
-                        bypass = false}
+                        offset_sec=240,   
+                        bypass = false,
+                        machine_type = 'Arum',
+                        coefficient_time = 0.95}
                       },
           count_machines = 4,
           log_path = [=[Z:\DATRON\Datron MSK.txt]=],
@@ -108,6 +120,7 @@
           stat_path0 = [=[Z:\DATRON\Files_STL_Checked]=]  ,
           MCR_path = [=[C:\Users\Public\Documents\hyperDENT\NC Output\]=],
           unchecked_path = [=[Z:\files_for_check\Unchecked]=],
+          calculation_path = [=[C:\Users\Public\Documents\hyperDENT\Calculation]=],
           run_update = true,  
           trig_time = 60,-- sec
           coefficient_time = 1.1}
@@ -274,22 +287,32 @@
     return obj
   end
   -------------------------------------------------------------------- 
-  function F_GetComTime(file_path) local comtime
-    if not file_path then return end
-    local file = io.open(file_path, 'r')
-    comtime = 1
-    if file then
-      local content = file:read(2000)
-      if not content then return comtime end
-      for line in content:gmatch('[^\n]+') do        
-        if line:find('Tooltime') then 
-          local t_time = line:reverse():match('[%d]+'):reverse()
-          if tonumber(t_time) then comtime = comtime + tonumber(t_time) end
+  function GetComTime2(machine_table) 
+    if not machine_table or not machine_table.current_working_file then return end
+    local f = io.open(machine_table.path..'/'..machine_table.current_working_file, 'r')
+    local comtime = 1
+    if f then
+      
+      --[[if machine_table.machine_type == 'Datron' then
+        local content = f:read(2000)
+        if not content then return comtime end
+        for line in content:gmatch('[^\n]+') do        
+          if line:find('Tooltime') then 
+            local t_time = line:reverse():match('[%d]+'):reverse()
+            if tonumber(t_time) then comtime = comtime + tonumber(t_time) end
+          end
         end
-      end
-      file:close()
+        
+       elseif machine_table.machine_type == 'Arum' then]]
+        f:seek('end', -20)
+        local context = f:read('a')
+        comtime = context:match('com_time.*')
+        if comtime then comtime = comtime:match('[%d]+') end    
+      --end
+      
+      f:close()
     end
-    return math.floor(comtime * data.coefficient_time)
+    return math.floor(comtime * machine_table.coefficient_time)
   end
   -------------------------------------------------------------------- 
   function Menu()
@@ -298,9 +321,9 @@
               {name = 'Statistics: get (MM/YYYY)',       func = function () str = Action_ParseStat(nil,nil,true) msg(str) end},
               {name = 'Statistics: Open stat file|', func = function () local cmd = 'start "" "'..data.stat_path..'"'  os.execute(cmd) end},
               {name = 'Log: Search by ID', func = function () Action_SearchLogsByID()  end},
-              {name = 'Log: Clear all|', func = function () 
+              {name = 'Log: Clear D5 logs|', func = function () 
                                                   for i = 1, #data.machines do 
-                                                    if data.machines[i].allow_clearing_log then
+                                                    if data.machines[i].machine_type and data.machines[i].machine_type == 'Datron' then
                                                       Action_Clear_Logs(data.machines[i].path..'Protokoll.txt') 
                                                     end
                                                   end end},
@@ -631,7 +654,7 @@
       
       if t.col_frame then
         local w_pr
-        if t.progress and t.progress > 0 then 
+        if t.state then 
           F_Get_SSV(obj.gui_color.green)
           w_pr = w * t.progress
          else
@@ -742,103 +765,142 @@
       mouse.last_my = mouse.my
   end  
   --------------------------------------------------------------------
+  function GetAdminStr(machine_table)
+    local str = machine_table.name..'\n'
+    if not machine_table.current_work_state then 
+      str = str..machine_table.current_work_ID.. ' готов'
+     else 
+        local r_h =  math.floor( math.floor( (machine_table.remaining)/60)/60)
+        local r_h_s
+        if r_h ==1 then 
+          r_h_s = 'час'
+         elseif 
+          r_h >= 2 and r_h <= 4  then r_h_s = 'часа'
+         else 
+          r_h_s = 'часов'
+        end
+        local r0 = r_h..' '..r_h_s..' '
+        if r_h == 0 then r0 = '' end
+        
+        local r_m = (math.floor( (machine_table.remaining)/60)%60)
+        local r_m_s
+        if r_m ==1 or (r_m > 20 and r_m % 10 == 1) then 
+          r_m_s = 'минуту'
+         elseif 
+          (r_m >= 2 and r_m <= 4) or (r_m > 20 and r_m % 10 >= 2 and r_m % 10 <= 4)  then r_m_s = 'минуты'
+         else r_m_s = 'минут'
+        end
+        local m0 = r_m..' '..r_m_s
+        if r_m == 0 then m0 ='' end
+        str = str..machine_table.current_work_ID.. ' будет готов через '..r0..m0
+    end
+    str = str..'\n\n'
+    return str
+  end
+  --------------------------------------------------------------------
+  function GetCurrentWorkingFile(machine_table)
+    local str = ''
+    local start_str = ''
+    local state = true
+    local f = io.open(machine_table.path..'/Protokoll.txt', "r")
+    if machine_table.machine_type == 'Datron' then
+      f:seek("end", -200)
+      local text = f:read("*a") 
+      for line in text:gmatch('[^\r\n]+') do if line:find('Start') or line:find('Ende') then str = line end end
+      if str:match('Start') then 
+        start_str = str:match('.-Start'):sub(0,-9)
+        str = str:match('Start.*'):sub(7)  
+        state = true       
+       else 
+        str = str:match('Ende.*'):sub(7) 
+        state = false
+      end
+     elseif machine_table.machine_type == 'Arum' then
+      f:seek("end", -200)
+      local text = f:read("*a")
+      local t = {}
+      for line in text:gmatch('[^\r\n]+') do t[#t+1] = line end
+      if #t > 1 then str = t[#t] end
+      start_str = str:sub(0,19)
+      if str then str = str:sub(21) end
+    end
+    if f then f:close() end
+    return str, start_str, state
+  end
+  --------------------------------------------------------------------
   function Data_Update() local com_time_TS, com_time
     if skip_check then return end
     if not trigger_update then return end
-    local str = ""
     
-    for i = 1, #data.machines do   
-    
-    
-      local f = io.open(data.machines[i].path..'/Protokoll.txt', "r")      
-      -- datron
-      if f then 
-        f:seek("end", -200)
-        local text = f:read("*a")
-        if not text then goto skip_text end
-        local srch_line
-        for line in text:gmatch('[^\r\n]+') do if line:find('Start') or line:find('Ende') then srch_line = line end end        
-        if srch_line then
-          local is_st = srch_line:find('Start')
-          local work_ID = Get_ID(srch_line)
-          local program_name
-          if is_st then program_name = srch_line:match('Start.*'):sub(7) else program_name = srch_line:match('Ende.*'):sub(7) end
-          local disk_ID = program_name:match('[%d]+[^%d]+') 
-          local com_time = F_GetComTime(data.machines[i].path..'/'..program_name)
-          if com_time then 
-            com_time_TS = math.floor(com_time * data.coefficient_time)
-            com_time = os.date("!%X", com_time_TS)
-           else 
-            com_time = ''
-          end  
-          local ts_last_line = Convert_DateToTimestamp(srch_line:sub(0,20))        
-          local elapsed = math.floor(os.time() - ts_last_line + data.machines[i].offset_sec)
-          if elapsed < 0 then elapsed = 0 end
-          if com_time and com_time_TS then obj.but['machine'..i].progress = elapsed/com_time_TS end
-          if  obj.but['machine'..i].progress and  obj.but['machine'..i].progress > 1 then  obj.but['machine'..i].progress = 1 end
-          obj.but['machine'..i].txt = data.machines[i].name..' | '..disk_ID:sub(0,-2)..'\n'..work_ID
-          if not is_st then obj.but['machine'..i].progress = nil else obj.but['machine'..i].txt = obj.but['machine'..i].txt..'\n'..os.date("!%X", elapsed )..' / '..com_time  end
-          str = str..'\n'..data.machines[i].name
-          if not com_time_TS then com_time_TS = 1 end
-          if not obj.but['machine'..i].progress then str = str..'\n'..'Готово: '..work_ID else
-            local r_h =  math.floor( math.floor( (com_time_TS-elapsed)/60)/60)
-            local r_h_s
-            if r_h ==1 then r_h_s = 'час'
-              elseif r_h >= 2 and r_h <= 4  then r_h_s = 'часа'
-              else r_h_s = 'часов'
-            end
-            local r0 = r_h..' '..r_h_s..' '
-            if r_h == 0 then r0 = '' end
-            local r_m = (math.floor( (com_time_TS-elapsed)/60)%60)
-            local r_m_s
-            if r_m ==1 or (r_m > 20 and r_m % 10 == 1) then r_m_s = 'минуту'
-              elseif (r_m >= 2 and r_m <= 4) or (r_m > 20 and r_m % 10 >= 2 and r_m % 10 <= 4)  then r_m_s = 'минуты'
-              else r_m_s = 'минут'
-            end
-            local m0 = r_m..' '..r_m_s
-            if r_m == 0 then m0 ='' end
-            str = str..'\n'..'Будет готово через '..
-              r0..
-              m0..': '..work_ID end
-          str = str..'\n'
+    -- update Arum stuff
+      for i = 1, #data.machines do if data.machines[i].machine_type == 'Arum' then
+        local f = io.open(data.machines[i].path..'/ARUMINFO.DAT', "r")
+        if f then 
+           local program_name = f:read("*a"):match('USERDATA.*nc'):sub(10)
+           local disk_ID = program_name:match('[%d]+[^%d]+')
+           local work_ID = Get_ID(program_name)
+           local log_pre_lastLine, srch_line = Arum_Writelog(data.machines[i].path, program_name) -- WRITE LOG
+           Arum_RemoveLastProgram(data.machines[i].path, log_pre_lastLine)  -- REMOVE LAST NC
         end
-      end
-      ::skip_text::
-     if f then f:close() end      
-     
-     -- arum
-     local f = io.open(data.machines[i].path..'/ARUMINFO.DAT', "r")
-     if f then 
-        local program_name = f:read("*a"):match('USERDATA.*nc'):sub(10)
-        local disk_ID = program_name:match('[%d]+[^%d]+')
-        local work_ID = Get_ID(program_name)
-        obj.but['machine'..i].txt = data.machines[i].name..' | '..disk_ID:sub(0,-2)..'\n'..work_ID
-        str = str..'\n'..data.machines[i].name
-        str = str..'\n'..work_ID
+        if f then f:close() end    
+      end end
+      
+      
+    -- get machine info
+      for i = 1, #data.machines do
+        local current_work_start_str
+        data.machines[i].current_working_file,
+        data.machines[i].current_work_start_str,
+        data.machines[i].current_work_state = GetCurrentWorkingFile(data.machines[i]) --READ LOG
+        data.machines[i].current_work_start_TS = Convert_DateToTimestamp(data.machines[i].current_work_start_str)
+        data.machines[i].current_disk_ID = data.machines[i].current_working_file:match('[%d]+[^%d]+'):sub(0,-2)
+        data.machines[i].current_work_ID = Get_ID(data.machines[i].current_working_file)
+        data.machines[i].current_work_comtime = GetComTime2(data.machines[i]) --  READ MCR/NC
+        data.machines[i].elapsed  = math.floor(os.time()-data.machines[i].current_work_start_TS + data.machines[i].offset_sec)
+        data.machines[i].elapsed_str = os.date("!%X", math.max(math.floor(data.machines[i].elapsed),1) )
+        data.machines[i].remaining = data.machines[i].current_work_comtime - data.machines[i].elapsed
+        if data.machines[i].remaining < 0 then data.machines[i].current_work_state = false end
+        data.machines[i].progress = data.machines[i].elapsed / data.machines[i].current_work_comtime
+        if data.machines[i].progress > 1 then data.machines[i].progress = 1 end
+        data.machines[i].admin_str = GetAdminStr(data.machines[i])
         
-        local log_pre_lastLine = Arum_Writelog(data.machines[i].path, program_name)
-        Arum_RemoveLastProgram(data.machines[i].path, log_pre_lastLine)
-     end
-     if f then f:close() end      
-     
-    end 
+        -- write GUI stuff
+          obj.but['machine'..i].progress = data.machines[i].progress
+          obj.but['machine'..i].state = data.machines[i].current_work_state
+          obj.but['machine'..i].txt = data.machines[i].name..' | '
+                                      ..data.machines[i].current_disk_ID..'\n'
+                                      ..data.machines[i].current_work_ID..'\n'
+          if data.machines[i].current_work_state then 
+            obj.but['machine'..i].txt = obj.but['machine'..i].txt
+                                        ..data.machines[i].elapsed_str..' / '
+                                        ..os.date("!%X", data.machines[i].current_work_comtime) 
+          end
+      end  
+        
+        
+    -- write admin log  
+      local adm_str = ""
+      for i = 1, # data.machines do  adm_str = adm_str..data.machines[i].admin_str end
+      --reaper.ClearConsole()
+      --msg(adm_str)
+      local file = io.open(data.log_path, 'w')
+      if file then
+        file:write(adm_str)
+        file:close()
+      end 
     
-    --msg(str)
-    local file = io.open(data.log_path, 'w')
-    if file then
-      file:write(str)
-      file:close()
-    end 
     update_gfx = true
     trigger_update = nil
   end
   -------------------------------------------------------------------- 
   function Arum_RemoveLastProgram(path, log_pre_lastLine)
     if not log_pre_lastLine or log_pre_lastLine == '' then return end
-    local filename = log_pre_lastLine:sub(21)
+    local filename = log_pre_lastLine:match('.*[^\r\n]'):sub(21)
     local src = path..filename
     local dest = path..'archive\\'..filename
     local f = io.open(src, 'r')
+    --msg(src)
+    --msg(f:read('a'))
     if f then 
       f:close() 
       reaper.ExecProcess('powershell -Command Move-Item '..src..' '..dest, 0)
@@ -864,13 +926,13 @@
        else
         f:close()
       end
-    if #t>1 then return t[#t-1] end
+    if #t>1 then return t[#t-1], t[#t] end
   end
   --------------------------------------------------------------------  
   function Convert_DateToTimestamp(s)
-    local p="(%d+).(%d+).(%d+)  (%d+):(%d+):(%d+)"
-    local s_day,s_month,s_year,s_hour,s_min,s_sec=s:match(p)    
-    if not (s_day and s_month and s_year and s_hour and s_min and s_sec) then return 100 end
+    local p="(%d+).(%d+).(%d+)(%s+)(%d+):(%d+):(%d+)"
+    local s_day,s_month,s_year,_,s_hour,s_min,s_sec=s:match(p)    
+    if not (s_day and s_month and s_year and s_hour and s_min and s_sec) then return 1 end
     if tonumber(s_year) < 2017 or tonumber(s_month) > 12 or tonumber(s_hour) > 24 or tonumber(s_day) > 31 or tonumber(s_min) > 60 or tonumber(s_sec ) > 60 then return 100 end
     return os.time({day=s_day,month=s_month,year=s_year,hour=s_hour,min=s_min,sec=s_sec})
   end
@@ -922,7 +984,7 @@
     if fp:lower():find('.mcr') then ext = '.mcr'
       elseif fp:lower():find('.nc') then ext = '.nc' end
     if ext then out = out..ext end
-    return out
+    return out, T_disk, t[2] -- t[2] render timestamp
   end
   ---------------------------------------------------------------------------  
   function Action_RenameMCR() 
@@ -934,21 +996,44 @@
           local filename_full = data.MCR_path..file_name
           local file = io.open(filename_full, 'r')
           if file then   
-            file:close()
-            
-            local new_name = GetNCname(filename_full)
+            file:close()            
+            local new_name,disk, ts = GetNCname(filename_full)
             if new_name and file_name ~= new_name then
               local command = 'rename "'..filename_full..'"  "'..new_name..'"'
-              os.execute(command)            
+              os.execute(command)   
+              if new_name then --and new_name:match('.nc') then 
+                AddTimeToNC(new_name, disk, ts)                
+              end
             end
-            
           end
           
         end
         i  = i + 1
       until file_name == nil
     end
- 
+  --------------------------------------------------------------------  
+  function AddTimeToNC(filename, disk, ts)
+    if not filename or not disk or not ts then return end
+    local log_path = data.calculation_path..'\\'..disk..'\\'..ts..'\\'..disk..'.log'
+    local f = io.open(log_path, 'r')
+    if f then
+      f:seek('end', -300)
+      local context = f:read('a')
+      local com_time = context:match('Total machining time.-[\n]')
+      if not com_time then f:close() return end
+      
+      local h=com_time:match('[%d]+ hours'):match('[%d]+')
+      local m=com_time:match('[%d]+ minutes'):match('[%d]+')
+      local s=com_time:match('[%d]+ seconds'):match('[%d]+')
+      ret_com_time = h*3600+m*60+s
+      f:close()
+      if ret_com_time then        
+        local f = io.open(data.MCR_path..filename, 'a')
+        f:write(';com_time='..math.floor(ret_com_time))
+        f:close()
+      end
+    end
+  end
   --------------------------------------------------------------------     
   function ContentCheck(content)
     local content = content:lower()
