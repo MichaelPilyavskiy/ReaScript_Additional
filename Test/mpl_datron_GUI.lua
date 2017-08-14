@@ -1,11 +1,14 @@
   name = 'DatronGUI'
-  vrs = '2.22'
+  vrs = '2.23'
   --local data = {}
   local obj = {}
   local mouse = {}
   --skip_check = true
   
     --[[  
+      - 2.23  14/08/2017
+        # fix some errors
+        # Get_ID shows model also
       - 2.22  11/08/2017
         + write com time to MCR/NC when rename
         + Parse com time from "Total machininhg time"
@@ -812,7 +815,8 @@
         str = str:match('Start.*'):sub(7)  
         state = true       
        else 
-        str = str:match('Ende.*'):sub(7) 
+        str = str:match('Ende.*')
+        if str then str = str:sub(7) end
         state = false
       end
      elseif machine_table.machine_type == 'Arum' then
@@ -825,7 +829,7 @@
       if str then str = str:sub(21) end
     end
     if f then f:close() end
-    return str, start_str, state
+    return true, str, start_str, state
   end
   --------------------------------------------------------------------
   function Data_Update() local com_time_TS, com_time
@@ -848,33 +852,35 @@
       
     -- get machine info
       for i = 1, #data.machines do
-        local current_work_start_str
-        data.machines[i].current_working_file,
+        local current_work_start_str, ret
+        ret, data.machines[i].current_working_file,
         data.machines[i].current_work_start_str,
         data.machines[i].current_work_state = GetCurrentWorkingFile(data.machines[i]) --READ LOG
-        data.machines[i].current_work_start_TS = Convert_DateToTimestamp(data.machines[i].current_work_start_str)
-        data.machines[i].current_disk_ID = data.machines[i].current_working_file:match('[%d]+[^%d]+'):sub(0,-2)
-        data.machines[i].current_work_ID = Get_ID(data.machines[i].current_working_file)
-        data.machines[i].current_work_comtime = GetComTime2(data.machines[i]) --  READ MCR/NC
-        data.machines[i].elapsed  = math.floor(os.time()-data.machines[i].current_work_start_TS + data.machines[i].offset_sec)
-        data.machines[i].elapsed_str = os.date("!%X", math.max(math.floor(data.machines[i].elapsed),1) )
-        data.machines[i].remaining = data.machines[i].current_work_comtime - data.machines[i].elapsed
-        if data.machines[i].remaining < 0 then data.machines[i].current_work_state = false end
-        data.machines[i].progress = data.machines[i].elapsed / data.machines[i].current_work_comtime
-        if data.machines[i].progress > 1 then data.machines[i].progress = 1 end
-        data.machines[i].admin_str = GetAdminStr(data.machines[i])
-        
-        -- write GUI stuff
-          obj.but['machine'..i].progress = data.machines[i].progress
-          obj.but['machine'..i].state = data.machines[i].current_work_state
-          obj.but['machine'..i].txt = data.machines[i].name..' | '
-                                      ..data.machines[i].current_disk_ID..'\n'
-                                      ..data.machines[i].current_work_ID..'\n'
-          if data.machines[i].current_work_state then 
-            obj.but['machine'..i].txt = obj.but['machine'..i].txt
-                                        ..data.machines[i].elapsed_str..' / '
-                                        ..os.date("!%X", data.machines[i].current_work_comtime) 
-          end
+        if ret then
+          data.machines[i].current_work_start_TS = Convert_DateToTimestamp(data.machines[i].current_work_start_str)
+          data.machines[i].current_disk_ID = data.machines[i].current_working_file:match('[%d]+[^%d]+'):sub(0,-2)
+          data.machines[i].current_work_ID = Get_ID(data.machines[i].current_working_file)
+          data.machines[i].current_work_comtime = GetComTime2(data.machines[i]) --  READ MCR/NC
+          data.machines[i].elapsed  = math.floor(os.time()-data.machines[i].current_work_start_TS + data.machines[i].offset_sec)
+          data.machines[i].elapsed_str = os.date("!%X", math.max(math.floor(data.machines[i].elapsed),1) )
+          data.machines[i].remaining = data.machines[i].current_work_comtime - data.machines[i].elapsed
+          if data.machines[i].remaining < 0 then data.machines[i].current_work_state = false end
+          data.machines[i].progress = data.machines[i].elapsed / data.machines[i].current_work_comtime
+          if data.machines[i].progress > 1 then data.machines[i].progress = 1 end
+          data.machines[i].admin_str = GetAdminStr(data.machines[i])
+          
+          -- write GUI stuff
+            obj.but['machine'..i].progress = data.machines[i].progress
+            obj.but['machine'..i].state = data.machines[i].current_work_state
+            obj.but['machine'..i].txt = data.machines[i].name..' | '
+                                        ..data.machines[i].current_disk_ID..'\n'
+                                        ..data.machines[i].current_work_ID..'\n'
+            if data.machines[i].current_work_state then 
+              obj.but['machine'..i].txt = obj.but['machine'..i].txt
+                                          ..data.machines[i].elapsed_str..' / '
+                                          ..os.date("!%X", data.machines[i].current_work_comtime) 
+            end
+        end
       end  
         
         
@@ -944,6 +950,9 @@
     if ID then ID = ID:reverse():sub(2,-2) end
     if not ID then ID = str:reverse():match('%d%d%d%d%d') if ID then ID = ID:reverse() end end
     if not ID then  ID = '' end
+    mod_ID = str:reverse():match('[%.](%d)[%_]')
+    if not mod_ID then mod_ID = str:reverse():match('[%.](%d%d)[%_]') end
+    if mod_ID and ID ~= '' then ID = ID..'_'..mod_ID:reverse() end
     return ID
   end
   --------------------------------------------------------------------
@@ -1000,6 +1009,7 @@
             local new_name,disk, ts = GetNCname(filename_full)
             if new_name and file_name ~= new_name then
               local command = 'rename "'..filename_full..'"  "'..new_name..'"'
+              --msg(new_name)
               os.execute(command)   
               if new_name then --and new_name:match('.nc') then 
                 AddTimeToNC(new_name, disk, ts)                
