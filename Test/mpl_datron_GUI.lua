@@ -1,11 +1,14 @@
   name = 'DatronGUI'
-  vrs = '2.23'
+  vrs = '2.25'
   --local data = {}
   local obj = {}
   local mouse = {}
   --skip_check = true
   
     --[[  
+      - 2.25  15/08/2017
+        # fix Data_Update/Get machine info  get working file without blank name
+        # GetID reduce 1st symb for 6-digit IDs
       - 2.23  14/08/2017
         # fix some errors
         # Get_ID shows model also
@@ -115,7 +118,7 @@
                         offset_sec=240,   
                         bypass = false,
                         machine_type = 'Arum',
-                        coefficient_time = 0.95}
+                        coefficient_time = 1}
                       },
           count_machines = 4,
           log_path = [=[Z:\DATRON\Datron MSK.txt]=],
@@ -806,6 +809,7 @@
     local start_str = ''
     local state = true
     local f = io.open(machine_table.path..'/Protokoll.txt', "r")
+    if not f then return end
     if machine_table.machine_type == 'Datron' then
       f:seek("end", -200)
       local text = f:read("*a") 
@@ -856,7 +860,10 @@
         ret, data.machines[i].current_working_file,
         data.machines[i].current_work_start_str,
         data.machines[i].current_work_state = GetCurrentWorkingFile(data.machines[i]) --READ LOG
-        if ret then
+        if ret 
+          and data.machines[i].current_working_file 
+          and data.machines[i].current_working_file:match('[%d]+[^%d]+') -- disk id
+          then
           data.machines[i].current_work_start_TS = Convert_DateToTimestamp(data.machines[i].current_work_start_str)
           data.machines[i].current_disk_ID = data.machines[i].current_working_file:match('[%d]+[^%d]+'):sub(0,-2)
           data.machines[i].current_work_ID = Get_ID(data.machines[i].current_working_file)
@@ -945,11 +952,10 @@
   --------------------------------------------------------------------
   function Get_ID(str)
     if not str then return '' end
-    local ID = str:reverse():match('[^%d]%d%d%d%d%d%d[^%d]') 
-    if not ID then ID = str:reverse():match('[^%d]%d%d%d%d%d[^%d]')  end
-    if ID then ID = ID:reverse():sub(2,-2) end
-    if not ID then ID = str:reverse():match('%d%d%d%d%d') if ID then ID = ID:reverse() end end
-    if not ID then  ID = '' end
+    local ID = str:reverse():match('%d%d%d%d%d%d')or  str:reverse():match('%d%d%d%d%d')
+    --if ID then ID = ID:reverse():sub(2,-2) end
+    --if not ID then ID = str:reverse():match('%d%d%d%d%d') if ID then ID = ID:reverse() end end
+    if not ID then ID = '' else ID = ID:reverse() end
     mod_ID = str:reverse():match('[%.](%d)[%_]')
     if not mod_ID then mod_ID = str:reverse():match('[%.](%d%d)[%_]') end
     if mod_ID and ID ~= '' then ID = ID..'_'..mod_ID:reverse() end
