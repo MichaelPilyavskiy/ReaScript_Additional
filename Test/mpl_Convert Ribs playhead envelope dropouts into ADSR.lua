@@ -1,5 +1,5 @@
 -- @description Convert Ribs playhead envelope dropouts into ADSR
--- @version 1.0
+-- @version 1.0alpha2
 -- @author MPL
 -- @changelog
 --   + init
@@ -60,7 +60,7 @@
       local a = tech_shift+data.a*scale.a
       local d = tech_shift+data.d*scale.d
       local r = tech_shift+data.r*scale.r 
-      if i < #points then if pos+a+d+r > points[#points][2] then r = points[#points][2] - pos - a- d end end
+      if i < #points then if pos+a+d+r > points[i+1][2] then r = points[i+1][2] - pos - a- d-tech_shift end end
       local value = points[i][3]
       local shape = points[i][4]
       local tension = points[i][5]
