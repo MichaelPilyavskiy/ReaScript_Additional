@@ -1,5 +1,3 @@
-﻿
-
   --------------------------------------------------------------------
 
   vrs = '1.04'
@@ -4238,6 +4236,7 @@ Purchase MPL scripts?
   --------------------------------------------------------------------
   function Run()
     F_xywh_gfx()
+    run_l = 2
     if run_l == 0 or run_l == 1 then
       if run_l == 0 then cnt = math.floor(os.clock() - ts) end
       
