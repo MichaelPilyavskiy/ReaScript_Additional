@@ -1,16 +1,22 @@
 -- @description RS5k manager
--- @version 0.1
+-- @version alpha
 -- @author MPL
--- @changelog
---   
 -- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--   init alpha
   
---[[ early beta as reimplementin Pattern Rack
-  15.09 0.1 basic gui
-            tabs
-            basic browser content
+--[[ 
+  08.2017           Early beta as reimplementing Pattern Rack
+  15.09.2017  0.1   basic gui
+                    tabs
+                    basic browser content
+  16.09.2017  0.11  SampleBrowser: browse for file
+                    SampleBrowser: favourites Save/Load
+                    SampleBrowser: scroll by wheel
   
   ]]
+  
+  
   local scr_title = 'RS5k manager'
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
@@ -23,8 +29,8 @@
                 aa = 1,
                 mode = 0,
                 font = 'Calibri',
-                fontsz = 18,
-                fontsz2 = 13,
+                fontsz = 20,
+                fontsz2 = 14,
                 col = { grey =    {0.5, 0.5,  0.5 },
                         white =   {1,   1,    1   },
                         red =     {1,   0,    0   },
@@ -43,9 +49,21 @@
     return math.max(min,  math.min(val, max) ) 
   end
   ---------------------------------------------------
-  local function ExtState_Save()
+  function ExtState_Save()
     _, conf.wind_x, conf.wind_y, conf.wind_w, conf.wind_h = gfx.dock(-1, 0,0,0,0)
-    for key in pairs(conf) do SetExtState(conf.ES_key, key, conf[key], true)  end
+    --for key in pairs(conf) do SetExtState(conf.ES_key, key, conf[key], true)  end
+    for k,v in spairs(conf, function(t,a,b) return b:lower() > a:lower() end) do SetExtState(conf.ES_key, k, conf[k], true) end   
+  end
+  ---------------------------------------------------
+  function spairs(t, order) --http://stackoverflow.com/questions/15706270/sort-a-table-in-lua
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+    if order then table.sort(keys, function(a,b) return order(t, a, b) end)  else  table.sort(keys) end
+    local i = 0
+    return function()
+              i = i + 1
+              if keys[i] then return keys[i], t[keys[i]] end
+           end
   end
   ---------------------------------------------------
   local function msg(s)  ShowConsoleMsg(os.date()..' '..s..'\n') end
@@ -66,10 +84,10 @@
     local w_sl = w 
     local y_sl = y      
     local h_sl = h 
-    if o.is_slider and (not o.axis or o.axis == 'x') then 
+    if o.is_slider and o.steps and (not o.axis or o.axis == 'x') then 
       x_sl = x + w/o.steps*o.val
       w_sl = w/o.steps
-     elseif o.is_slider and o.axis == 'y' then 
+     elseif o.is_slider  and o.steps and o.axis == 'y' then 
       y_sl = y + h/o.steps*o.val
       h_sl = h - h/o.steps
     end  
@@ -81,7 +99,12 @@
       col('white', o.alpha_txt or 0.8)
       local f_sz = gui.fontsz
       gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
-      gfx.x = x+ (w-gfx.measurestr(txt))/2
+      if gfx.measurestr(o.txt) > w then 
+        repeat o.txt = o.txt:sub(2) until gfx.measurestr(o.txt..'> ...')< w -2
+        o.txt = '...'..o.txt
+      end
+      if o.txt2 then o.txt = o.txt2..' '..o.txt end
+      gfx.x = x+ (w-gfx.measurestr(o.txt))/2
       if o.aligh_txt and o.aligh_txt == 1 then gfx.x = x + 1 end -- align left
       gfx.y = y+ (h-gfx.texth)/2
       if o.bot_al_txt then 
@@ -94,14 +117,14 @@
     if o.a_frame then  -- low frame
       col(o.col, o.a_frame or 0.2)
       --gfx.rect(x,y,w,h,0)
-      gfx.x,gfx.y = x,y
-      gfx.lineto(x,y+h)
+      --gfx.x,gfx.y = x,y
+      --gfx.lineto(x,y+h)
       gfx.x,gfx.y = x+1,y+h
       gfx.lineto(x+w,y+h)
-      gfx.x,gfx.y = x+w,y+h-1
-      gfx.lineto(x+w,y)
-      gfx.x,gfx.y = x+w-1,y
-      gfx.lineto(x+1,y)
+      --gfx.x,gfx.y = x+w,y+h-1
+      --gfx.lineto(x+w,y)
+      --gfx.x,gfx.y = x+w-1,y
+      --gfx.lineto(x+1,y)
     end
   end
   ---------------------------------------------------
@@ -180,7 +203,7 @@
           0,0,gfx.w, gfx.h,
           0,0,gfx.w, gfx.h, 0,0)  
     --  blit browser
-      if blit_h then
+      if blit_h and obj.blit_y_src then
         gfx.blit(3, 1, 0, -- backgr
           0,  obj.blit_y_src+obj.browser.y+obj.item_h2, obj.tab_div, blit_h,
           0,  obj.browser.y+obj.item_h2,              obj.tab_div, blit_h, 0,0) 
@@ -201,7 +224,7 @@
   end
   ---------------------------------------------------
   local function ExtState_Def()
-    return {ES_key = 'MPL_'..scr_title,
+    local t= {ES_key = 'MPL_'..scr_title,
             wind_x =  50,
             wind_y =  50,
             wind_w =  600,
@@ -209,7 +232,11 @@
             dock =    0,
             tab = 0,
             tab_div = 0.3,
-            cur_smpl_browser_dir =  GetResourcePath():gsub('\\','/')}
+            cur_smpl_browser_dir =  GetResourcePath():gsub('\\','/'),
+            fav_path_cnt = 4,
+            mouse_wheel_res = 960}
+    for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
+    return t
   end
   ---------------------------------------------------
   local function ExtState_Load()
@@ -217,7 +244,7 @@
     for key in pairs(def) do 
       local es_str = GetExtState(def.ES_key, key)
       if es_str == '' then conf[key] = def[key] else conf[key] = tonumber(es_str) or es_str end
-    end
+    end    
   end
   ---------------------------------------------------
   local function OBJ_define()  
@@ -291,6 +318,7 @@
     obj.scroll.val = slider_val
     obj.scroll.h = gfx.h-obj.item_h-obj.item_h2-3
     --
+    for key in pairs(obj) do if type(obj[key]) == 'table' and obj[key].clear then obj[key] = nil end end
     if conf.tab == 0 then 
       local cnt_it = OBJ_GenSampleBrowser() 
       obj.scroll.steps = cnt_it
@@ -298,10 +326,65 @@
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
   end
   ---------------------------------------------------
+  function GetParentFolder(dir) return dir:match('(.*)[%\\/]') end
+  ---------------------------------------------------
+  function Menu_FormBrowser()                   
+    local browser_t =
+                                  {
+                                    {str = 'Browse for file/path',
+                                    func = function()
+                                              local ret, fn = GetUserFileNameForRead('', 'Browse for file/path', '.wav' )
+                                              if ret then
+                                                local par_fold = GetParentFolder(fn)
+                                                if par_fold then 
+                                                  conf.cur_smpl_browser_dir = par_fold 
+                                                  ExtState_Save()
+                                                  redraw = 1                                             
+                                                end
+                                              end
+                                            end
+                                    },                                
+                                    {str = '|>Save as favourite|1 - '..conf.smpl_browser_fav_path1,
+                                    func = function()
+                                              conf.smpl_browser_fav_path1 = conf.cur_smpl_browser_dir
+                                              ExtState_Save()
+                                              redraw = 1 
+                                            end
+                                    }
+                                  }
+    -- save favourite 
+    for i = 2, conf.fav_path_cnt  do
+      if conf['smpl_browser_fav_path'..i] then 
+        if i == conf.fav_path_cnt or not conf['smpl_browser_fav_path'..i+1] then close = '<' else close = '' end
+        browser_t[#browser_t+1] = { str = close..i..' - '..conf['smpl_browser_fav_path'..i],
+                                  func = function()
+                                    conf['smpl_browser_fav_path'..i] = conf.cur_smpl_browser_dir
+                                    ExtState_Save()
+                                    redraw = 1 
+                                  end
+                                }
+      end
+    end 
+    -- load favourite
+    for i = 1, conf.fav_path_cnt  do
+      if conf['smpl_browser_fav_path'..i] then
+        browser_t[#browser_t+1] = { str = 'Fav'..i..' - '..conf['smpl_browser_fav_path'..i],
+                                  func = function()
+                                    conf.cur_smpl_browser_dir = conf['smpl_browser_fav_path'..i]
+                                    ExtState_Save()
+                                    redraw = 1 
+                                  end
+                                }    
+      end
+    end
+    return  browser_t
+  end
+  ---------------------------------------------------
   function OBJ_GenSampleBrowser()
     local it_alpha = 0.3
     local up_w = 20
-    obj.browser_up = { x = obj.browser.x,
+    obj.browser_up = { clear = true,
+                  x = obj.browser.x,
                 y = obj.browser.y,
                 w = up_w,
                 h = obj.item_h2,
@@ -312,8 +395,17 @@
                 is_but = true,
                 fontsz = gui.fontsz2,
                 alpha_back = it_alpha,
-                func =  function() end}    
-    obj.browser_cur = { x = up_w+1+obj.browser.x,
+                func =  function() 
+                          local path = GetParentFolder(conf.cur_smpl_browser_dir) 
+                          if path then 
+                            conf.cur_smpl_browser_dir = path 
+                            ExtState_Save()
+                            redraw = 1
+                          end
+                        end} 
+    ------ browser menu form --------------- 
+    obj.browser_cur = { clear = true,
+                x = up_w+1+obj.browser.x,
                 y = obj.browser.y,
                 w = obj.tab_div-up_w-1,
                 h = obj.item_h2,
@@ -324,36 +416,50 @@
                 is_but = true,
                 fontsz = gui.fontsz2,
                 alpha_back = it_alpha,
-                func =  function()   end}
+                func =  function() Menu(Menu_FormBrowser()) end}
     local cur_dir_list = GetDirList(conf.cur_smpl_browser_dir)
     blit_h = #cur_dir_list*obj.item_h2 + obj.browser.y
     obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))
     for i = 1, #cur_dir_list do
       local txt = cur_dir_list[i][1]
-      if  cur_dir_list[i][2] == 0 then txt = '> '..txt end
+      local txt2 if  cur_dir_list[i][2] == 0 then txt2 = '>' end
       obj['browser_dirlist'..i] = 
-                { x = obj.browser.x,
-                  y = obj.browser.y + 2  + obj.item_h2+(i-1)*obj.item_h2,
+                { clear = true,
+                  x = obj.browser.x,
+                  y = obj.browser.y + 1  + obj.item_h2+(i-1)*obj.item_h2,
                   w = obj.tab_div-obj.scroll_w,
                   h = obj.item_h2,
                   col = 'white',
                   state = 0,
                   txt= txt,
+                  txt2=txt2,
                   aligh_txt = 1,
                   blit = true,
                   show = true,
                   is_but = true,
                   fontsz = gui.fontsz2,
-                  alpha_back = 0,
-                  a_frame = 0.2,
+                  alpha_back = 0.2,
+                  a_frame = 0.1,
                   --mouse_offs_y = blit_y,
                   func =  function() 
                             local p = conf.cur_smpl_browser_dir..'/'..cur_dir_list[i][1] 
                             p = p:gsub('\\','/')
+                            if not IsSupportedExtension(p) then 
+                              conf.cur_smpl_browser_dir = p
+                              ExtState_Save()
+                              redraw = 1
+                            end
                           end}    
     end
     local cnt = lim((gfx.h-obj.browser.h)/#cur_dir_list, 2, math.huge)
     return cnt
+  end
+  ---------------------------------------------------
+  function IsSupportedExtension(fn)
+    if fn 
+      and fn:lower():match('%.wav') then 
+        return true 
+    end
   end
   ---------------------------------------------------
   function GetDirList(dir)
@@ -366,16 +472,31 @@
     until not path
     repeat
       fn = EnumerateFiles( dir, fileindex )
-      if fn and fn:find('%.wav') then t[#t+1] = {fn,1} end
+      if IsSupportedExtension(fn) then t[#t+1] = {fn,1} end
       fileindex = fileindex+1
     until not fn
     return t
   end
   ---------------------------------------------------
   function Menu(t)
+    local str, check = '', ''
+    for i = 1, #t do
+      if t[i].state then check = '!' else check ='' end
+      str = str..check..t[i].str..'|'
+    end
     gfx.x = mouse.mx
     gfx.y = mouse.my
-    local ret = gfx.showmenu('')
+    local ret = gfx.showmenu(str)
+    if ret > 0 then if t[ret].func then t[ret].func() end end
+    --local id_match = {}
+    --local id = 0
+    --[[if not t[i].str:find('>') then id = id + 1 end
+    id_match[#id_match+1] = id ]]
+      --[[msg(ret) 
+      msg(id_match[ret])
+      if t[id_match[ret] ].func then 
+        t[id_match[ret] ].func() 
+      end ]]    
   end
  ---------------------------------------------------
   function MOUSE_Match(b) 
@@ -439,7 +560,12 @@
         end
       end
     end
-      
+    
+    -- scroll
+      if MOUSE_Match(obj.browser) and mouse.wheel_trig ~= 0 then
+        slider_val = lim(slider_val - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
+        redraw = 1
+      end
     
     -- mouse release    
       if mouse.last_LMB_state and not mouse.LMB_state   then  
@@ -459,7 +585,7 @@
   ---------------------------------------------------
   local SCC, lastSCC
   function CheckUpdates()
-    retval = 0
+    local retval = 0
     -- force by proj change state
       SCC =  GetProjectStateChangeCount( 0 ) 
       if not lastSCC then retval = -1  end 
@@ -487,8 +613,8 @@
   ---------------------------------------------------
   ExtState_Load()  
   gfx.init('MPL '..scr_title,
-            600,--conf.wind_w, 
-            200,--conf.wind_h, 
+            conf.wind_w, 
+            conf.wind_h, 
             conf.dock, conf.wind_x, conf.wind_y)
   OBJ_define()
   OBJ_Update()
