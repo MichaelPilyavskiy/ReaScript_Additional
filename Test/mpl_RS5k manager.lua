@@ -10,21 +10,26 @@
   15.09.2017  0.1   basic gui
                     tabs
                     basic browser content
-  16.09.2017  0.11  SampleBrowser: browse for file
+  16.09.2017  0.12  SampleBrowser: browse for file
                     SampleBrowser: favourites Save/Load
-                    SampleBrowser: scroll by wheel
+                    SampleBrowser: scroll by wheel   
+                    SampleBrowser: drag n drop to keys (export to rs5k)
+                    Keys: show MID note
+                    Keys: show linked samples
   
   ]]
   
-  
-  local scr_title = 'RS5k manager'
+  --NOT gfx NOT reaper
+  local scr_title = 'RS5K manager'
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
-  local mouse = {}
+  mouse = {}
   local obj = {}
   conf = {}
-  redraw = -1
-  blit_h,slider_val = 0,0
+  data = {}
+  action_export = {}
+  local redraw = -1
+  local blit_h,slider_val = 0,0
   local gui = {
                 aa = 1,
                 mode = 0,
@@ -43,6 +48,32 @@
     gui.fontsz = gui.fontsz - 7 
     gui.fontsz2 = gui.fontsz2 - 7 
   end
+  ---------------------------------------------------
+  function ExtState_Def()
+    local t= {
+            -- globals
+            ES_key = 'MPL_'..scr_title,
+            wind_x =  50,
+            wind_y =  50,
+            wind_w =  600,
+            wind_h =  200,
+            dock =    0,
+            -- GUI
+            tab = 0,
+            tab_div = 0.3,
+            -- GUI control
+            mouse_wheel_res = 960,
+            -- Samples
+            cur_smpl_browser_dir =  GetResourcePath():gsub('\\','/'),
+            fav_path_cnt = 4,
+            -- Pads
+            keymode = 0,
+            oct_shift = 5,
+            key_names = 8
+            }
+    for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
+    return t
+  end  
   ---------------------------------------------------
   local function lim(val, min,max) --local min,max 
     if not min or not max then min, max = 0,1 end 
@@ -99,32 +130,65 @@
       col('white', o.alpha_txt or 0.8)
       local f_sz = gui.fontsz
       gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
-      if gfx.measurestr(o.txt) > w then 
-        repeat o.txt = o.txt:sub(2) until gfx.measurestr(o.txt..'> ...')< w -2
-        o.txt = '...'..o.txt
+      local y_shift = 0
+      for line in o.txt:gmatch('[^\r\n]+') do
+        if gfx.measurestr(line) > w then 
+          repeat line = line:sub(2) until gfx.measurestr(line..'...')< w -2
+          line = '...'..line
+        end
+        if o.txt2 then line = o.txt2..' '..line end
+        gfx.x = x+ (w-gfx.measurestr(line))/2
+        gfx.y = y+ (h-gfx.texth)/2 + y_shift 
+        if o.aligh_txt then
+          if o.aligh_txt&1 then gfx.x = x + 1 end -- align left
+          if o.aligh_txt>>2&1 then gfx.y = y + y_shift end -- align top
+        end
+        if o.bot_al_txt then 
+          gfx.y = y+ h-gfx.texth-3 +y_shift
+        end
+        gfx.drawstr(line)
+        y_shift = y_shift + gfx.texth
       end
-      if o.txt2 then o.txt = o.txt2..' '..o.txt end
-      gfx.x = x+ (w-gfx.measurestr(o.txt))/2
-      if o.aligh_txt and o.aligh_txt == 1 then gfx.x = x + 1 end -- align left
-      gfx.y = y+ (h-gfx.texth)/2
-      if o.bot_al_txt then 
-        gfx.y = y+ h-gfx.texth-3
-      end
-      gfx.drawstr(o.txt)
     end
     
     -- frame
-    if o.a_frame then  -- low frame
+    if o.a_line then  -- low frame
       col(o.col, o.a_frame or 0.2)
-      --gfx.rect(x,y,w,h,0)
-      --gfx.x,gfx.y = x,y
-      --gfx.lineto(x,y+h)
       gfx.x,gfx.y = x+1,y+h
       gfx.lineto(x+w,y+h)
-      --gfx.x,gfx.y = x+w,y+h-1
+    end
+    -- frame
+    if o.a_frame then  -- low frame
+      col(o.col, o.a_frame or 0.2)
+      gfx.rect(x,y,w,h,0)
+      gfx.x,gfx.y = x,y
+      gfx.lineto(x,y+h)
+      gfx.x,gfx.y = x+1,y+h
+      --gfx.lineto(x+w,y+h)
+      gfx.x,gfx.y = x+w,y+h-1
       --gfx.lineto(x+w,y)
-      --gfx.x,gfx.y = x+w-1,y
-      --gfx.lineto(x+1,y)
+      gfx.x,gfx.y = x+w-1,y
+      gfx.lineto(x+1,y)
+    end    
+    
+  end
+  function math_q(num)  if math.abs(num - math.floor(num)) < math.abs(num - math.ceil(num)) then return math.floor(num) else return math.ceil(num) end end
+  ---------------------------------------------------
+  function Data_Update()
+    data = {}
+    local tr = GetSelectedTrack(0,0)
+    if not tr then return end
+    data.tr_pointer = tr
+    for fxid = 1,  TrackFX_GetCount( tr ) do
+      local retval, buf =TrackFX_GetFXName( tr, fxid-1, '' )
+      if buf:lower():match('rs5k') or buf:lower():match('reasamplomatic5000') then
+        local retval, fn = TrackFX_GetNamedConfigParm( tr, fxid-1, 'FILE' )
+        local pitch = math_q(TrackFX_GetParamNormalized( tr, fxid-1, 3)*127)
+        data[#data+1] = {idx = fxid-1,
+                        name = buf,
+                        fn = fn,
+                        pitch=pitch }
+      end
     end
   end
   ---------------------------------------------------
@@ -137,6 +201,7 @@
       
     --  init
       if redraw == -1 then
+        Data_Update()
         OBJ_Update()
         gfx.dest = 2
         gfx.setimgdim(2, -1, -1)  
@@ -161,6 +226,7 @@
       
     -- refresh
       if redraw == 1 then 
+        Data_Update()
         OBJ_Update()
         -- refresh backgroung
           gfx.dest = 1
@@ -169,11 +235,6 @@
           gfx.blit( 2, 1, 0, -- grad back
                     0,0,  obj.grad_sz,obj.grad_sz/2,
                     0,0,  gfx.w,gfx.h, 0,0)
-          gfx.a = 0.1
-          --gfx.line(gfx.w-obj.menu_w, 0,gfx.w-obj.menu_w, gfx.h )
-        -- tab div
-          col('white', 0.2)
-          local div = gfx.line(obj.tab_div, 0, obj.tab_div, gfx.h)
         -- refresh all buttons
           for key in pairs(obj) do 
             if type(obj[key]) == 'table' and obj[key].show and not obj[key].blit then 
@@ -209,6 +270,21 @@
           0,  obj.browser.y+obj.item_h2,              obj.tab_div, blit_h, 0,0) 
       end    
     
+    -- drag&drop item to keys
+      if action_export.state then
+        local name = GetShortSmplName(action_export.fn)
+        gfx.setfont(1, gui.font,gui.fontsz2 )
+        GUI_DrawObj({ x = mouse.mx + 10,
+                        y = mouse.my,
+                        w = gfx.measurestr(name),
+                        h = gfx.texth,
+                        col = 'white',
+                        state = 0,
+                        txt = name,
+                        show = true,
+                        fontsz = gui.fontsz2,
+                        alpha_back = 0.1})
+      end
     redraw = 0
     gfx.update()
   end
@@ -221,22 +297,6 @@
     if not obj.last_gfxx then retval = -1 end
     obj.last_gfxx, obj.last_gfxy, obj.last_gfxw, obj.last_gfxh = wx,wy,ww,wh
     return retval
-  end
-  ---------------------------------------------------
-  local function ExtState_Def()
-    local t= {ES_key = 'MPL_'..scr_title,
-            wind_x =  50,
-            wind_y =  50,
-            wind_w =  600,
-            wind_h =  200,
-            dock =    0,
-            tab = 0,
-            tab_div = 0.3,
-            cur_smpl_browser_dir =  GetResourcePath():gsub('\\','/'),
-            fav_path_cnt = 4,
-            mouse_wheel_res = 960}
-    for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
-    return t
   end
   ---------------------------------------------------
   local function ExtState_Load()
@@ -252,7 +312,7 @@
     obj.grad_sz = 200
     obj.item_h = 30   
     obj.item_h2 = 15
-    obj.scroll_w = 25
+    obj.scroll_w = 15
     
     obj.slider = { x = 0,
                 y = 0,
@@ -279,6 +339,13 @@
                 state = 0,
                 alpha_back = 0.4,
                 ignore_mouse = true}
+    obj.workarea =      { 
+                y = 0,
+                h = gfx.h,
+                col = 'white',
+                state = 0,
+                alpha_back = 0.4,
+                ignore_mouse = true}                
     obj.scroll =  {
                 y = obj.item_h+2+obj.item_h2,
                 w = obj.scroll_w,
@@ -314,16 +381,137 @@
     --
     obj.browser.w = obj.tab_div
     --
+    obj.workarea.x = obj.tab_div+1
+    obj.workarea.w = gfx.w - obj.tab_div - 2
+    --
     obj.scroll.x =  obj.tab_div-obj.scroll_w
     obj.scroll.val = slider_val
     obj.scroll.h = gfx.h-obj.item_h-obj.item_h2-3
     --
     for key in pairs(obj) do if type(obj[key]) == 'table' and obj[key].clear then obj[key] = nil end end
     if conf.tab == 0 then 
-      local cnt_it = OBJ_GenSampleBrowser() 
+      local cnt_it = OBJ_GenSampleBrowser()
+      if conf.keymode == 0 then OBJ_GenKeys() end
       obj.scroll.steps = cnt_it
     end
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
+  end
+-----------------------------------------------------------------------    
+  function GetNoteStr(val) 
+    local oct_shift = conf.oct_shift-7
+    if conf.key_names == 0 then
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end
+     elseif conf.key_names == 1 then
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B',}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
+     elseif conf.key_names == 2 then
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si',}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end      
+     elseif conf.key_names == 3 then
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Si',}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end       
+     elseif conf.key_names == 4 -- midi pitch
+      then return val
+     elseif 
+      conf.key_names == 5 -- freq
+      then return math.floor(440 * 2 ^ ( (val - 69) / 12))..'Hz'
+     elseif 
+      conf.key_names == 6 -- empty
+      then return ''
+     elseif 
+      conf.key_names == 7 then -- ru
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'До', 'До#', 'Ре', 'Ре#', 'Ми', 'Фа', 'Фа#', 'Соль', 'Соль#', 'Ля', 'Ля#', 'Си'}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
+     elseif conf.key_names == 8 then
+      if not val then return end
+      local val = math.floor(val)
+      local oct = math.floor(val / 12)
+      local note = math.fmod(val,  12)
+      local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
+      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift..'\n'..val end              
+    end
+  end
+  ---------------------------------------------------
+  function GetShortSmplName(path)
+    local fn = path
+    fn = fn:gsub('%\\','/')
+    if fn then fn = fn:reverse():match('(.-)/') end
+    if fn then fn = fn:reverse() end
+    if fn then fn = fn:match('(.*).wav') end
+    return fn
+  end
+  ---------------------------------------------------
+  function GetSampleNameByNote(note)
+    local str = ''
+    for i = 1, #data do
+      if data[i].pitch == note then 
+        fn = GetShortSmplName(data[i].fn)
+        return fn, true
+      end
+    end
+    return str
+  end
+  ---------------------------------------------------
+  function OBJ_GenKeys()
+    local opt_h = obj.item_h +  1 + obj.item_h2 + 1
+    local key_w = math.ceil(obj.workarea.w/7)
+    local key_h = math.ceil(0.5*(gfx.h - opt_h))
+    local shifts  = {{0,1},
+                {0.5,0},
+                {1,1},
+                {1.5,0},
+                {2,1},
+                {3,1},
+                {3.5,0},
+                {4,1},
+                {4.5,0},
+                {5,1},
+                {5.5,0},
+                {6,1},
+              }
+              
+    for i = 1, 12 do
+      local fn, ret = GetSampleNameByNote((i-1)+12*conf.oct_shift)
+      local col = 'white'
+      if ret then col = 'green' end
+      obj['keys_'..i] = 
+                { clear = true,
+                  x = obj.workarea.x+shifts[i][1]*key_w,
+                  y = opt_h+ shifts[i][2]*key_h,
+                  w = key_w,
+                  h = key_h,
+                  col = col,
+                  state = 0,
+                  txt= GetNoteStr((i-1)+12*conf.oct_shift)..'\n\r'..fn,
+                  linked_note = (i-1)+12*conf.oct_shift,
+                  show = true,
+                  is_but = true,
+                  alpha_back = 0.2+ 0.2*shifts[i][2],
+                  a_frame = 0.1,
+                  aligh_txt = 5,
+                  fontsz = gui.fontsz2}       
+    end
   end
   ---------------------------------------------------
   function GetParentFolder(dir) return dir:match('(.*)[%\\/]') end
@@ -439,8 +627,8 @@
                   is_but = true,
                   fontsz = gui.fontsz2,
                   alpha_back = 0.2,
-                  a_frame = 0.1,
-                  --mouse_offs_y = blit_y,
+                  a_line = 0.1,
+                  mouse_offs_y = obj.blit_y_src,
                   func =  function() 
                             local p = conf.cur_smpl_browser_dir..'/'..cur_dir_list[i][1] 
                             p = p:gsub('\\','/')
@@ -448,11 +636,18 @@
                               conf.cur_smpl_browser_dir = p
                               ExtState_Save()
                               redraw = 1
+                             else
+                              GetSampleToExport(p)
                             end
                           end}    
     end
     local cnt = lim((gfx.h-obj.browser.h)/#cur_dir_list, 2, math.huge)
     return cnt
+  end
+  ---------------------------------------------------
+  function GetSampleToExport(fn)
+    action_export = {state = true,
+                     fn = fn}
   end
   ---------------------------------------------------
   function IsSupportedExtension(fn)
@@ -502,18 +697,19 @@
   function MOUSE_Match(b) 
     if not b.mouse_offs_y then b.mouse_offs_y = 0 end
     if b.x and b.y and b.w and b.h then 
-      return mouse.mx > b.x 
-        and mouse.mx < b.x+b.w 
-        and mouse.my > b.y + b.mouse_offs_y
-        and mouse.my < b.y+b.h + b.mouse_offs_y
-      end  
+      local state= mouse.mx > b.x 
+              and mouse.mx < b.x+b.w 
+              and mouse.my > b.y - b.mouse_offs_y
+              and mouse.my < b.y+b.h - b.mouse_offs_y
+      if state and not b.ignore_mouse then mouse.context = b.context return true end
+    end  
   end
  ------------- -------------------------------------- 
   function MOUSE_Click(b,flag) 
     if b.ignore_mouse then return end
     if not flag then flag = 'L' end 
     if MOUSE_Match(b) and mouse[flag..'MB_state'] and not mouse['last_'..flag..'MB_state'] then 
-      mouse.context_latch = b.context 
+      mouse.context_latch = mouse.context
       return true
     end
   end
@@ -533,6 +729,7 @@
     if mouse.last_wheel then mouse.wheel_trig = (mouse.wheel - mouse.last_wheel) end 
     if mouse.LMB_state and not mouse.last_LMB_state then  mouse.last_mx_onclick = mouse.mx     mouse.last_my_onclick = mouse.my end    
     if mouse.last_mx_onclick and mouse.last_my_onclick then mouse.dx = mouse.mx - mouse.last_mx_onclick  mouse.dy = mouse.my - mouse.last_my_onclick else mouse.dx, mouse.dy = 0,0 end
+    
     -- butts    
     for key in pairs(obj) do
       if not key:match('knob') and type(obj[key]) == 'table' then
@@ -562,7 +759,7 @@
     end
     
     -- scroll
-      if MOUSE_Match(obj.browser) and mouse.wheel_trig ~= 0 then
+      if mouse.mx < obj.browser.x + obj.browser.w  and mouse.wheel_trig and mouse.wheel_trig ~= 0 then
         slider_val = lim(slider_val - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
         redraw = 1
       end
@@ -571,6 +768,13 @@
       if mouse.last_LMB_state and not mouse.LMB_state   then  
         mouse.context_latch = ''
         mouse.context_latch_val = 0
+        if action_export.state 
+          and obj[ mouse.context ] 
+          and obj[ mouse.context ].linked_note then
+            local note = obj[ mouse.context ].linked_note
+            ExportItemToRS5K(action_export.fn, note)
+        end
+        action_export = {}
       end
       mouse.last_mx = mouse.mx
       mouse.last_my = mouse.my
@@ -583,6 +787,33 @@
       mouse.last_wheel = mouse.wheel      
   end
   ---------------------------------------------------
+  function ExportItemToRS5K(fn, note)
+    local ex = false
+    for i = 1, #data do
+      if data[i].pitch == note then
+        TrackFX_SetNamedConfigParm(  data.tr_pointer, data[i].idx, 'FILE0', fn)
+        TrackFX_GetNamedConfigParm(  data.tr_pointer, data[i].idx, 'DONE', '') 
+        redraw = 1
+        ex = true
+        break
+      end
+    end
+    if not ex and data.tr_pointer then 
+      local rs5k_pos = TrackFX_AddByName( data.tr_pointer, 'ReaSamplomatic5000', false, -1 )
+      TrackFX_SetNamedConfigParm(  data.tr_pointer, rs5k_pos, 'FILE0', fn)
+      TrackFX_GetNamedConfigParm(  data.tr_pointer, rs5k_pos, 'DONE', '')      
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 2, 0) -- gain for min vel
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 3, note/127 ) -- note range start
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 4, note/127 ) -- note range end
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 5, 0.5 ) -- pitch for start
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 6, 0.5 ) -- pitch for end
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 8, 0 ) -- max voices = 0
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 9, 0 ) -- attack
+      reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 11, 0 ) -- obey note offs
+      redraw = 1
+    end
+  end
+  ---------------------------------------------------  
   local SCC, lastSCC
   function CheckUpdates()
     local retval = 0
