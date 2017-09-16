@@ -10,24 +10,25 @@
   15.09.2017  0.1   basic gui
                     tabs
                     basic browser content
-  16.09.2017  0.12  SampleBrowser: browse for file
+  16.09.2017  0.13  SampleBrowser: browse for file
                     SampleBrowser: favourites Save/Load
                     SampleBrowser: scroll by wheel   
                     SampleBrowser: drag n drop to keys (export to rs5k)
-                    Keys: show MID note
+                    Keys: show/preview MIDI note
                     Keys: show linked samples
-  
+                    Keys: MIDI prepare track if at least one RS5K instance found
+                    Data: sort data table by MIDI note (for potential support layer), currently replacing sample
   ]]
   
   --NOT gfx NOT reaper
   local scr_title = 'RS5K manager'
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
-  mouse = {}
+  local mouse = {}
   local obj = {}
   conf = {}
-  data = {}
-  action_export = {}
+  local data = {}
+  local action_export = {}
   local redraw = -1
   local blit_h,slider_val = 0,0
   local gui = {
@@ -174,21 +175,37 @@
   end
   function math_q(num)  if math.abs(num - math.floor(num)) < math.abs(num - math.ceil(num)) then return math.floor(num) else return math.ceil(num) end end
   ---------------------------------------------------
+  function MIDI_prepare(tr)
+    local bits_set=tonumber('111111'..'00000',2)
+    SetMediaTrackInfo_Value( tr, 'I_RECINPUT', 4096+bits_set ) -- set input to all MIDI
+    SetMediaTrackInfo_Value( tr, 'I_RECMON', 1) -- monitor input
+    SetMediaTrackInfo_Value( tr, 'I_RECARM', 1) -- arm track
+    SetMediaTrackInfo_Value( tr, 'I_RECMODE',0) -- record MIDI out
+  end
+  ---------------------------------------------------
   function Data_Update()
     data = {}
+    local temp = {}
     local tr = GetSelectedTrack(0,0)
     if not tr then return end
     data.tr_pointer = tr
+    local ex = false
     for fxid = 1,  TrackFX_GetCount( tr ) do
       local retval, buf =TrackFX_GetFXName( tr, fxid-1, '' )
       if buf:lower():match('rs5k') or buf:lower():match('reasamplomatic5000') then
+        ex = true
         local retval, fn = TrackFX_GetNamedConfigParm( tr, fxid-1, 'FILE' )
         local pitch = math_q(TrackFX_GetParamNormalized( tr, fxid-1, 3)*127)
-        data[#data+1] = {idx = fxid-1,
+        temp[#temp+1] = {idx = fxid-1,
                         name = buf,
                         fn = fn,
                         pitch=pitch }
       end
+    end
+    if ex then MIDI_prepare(tr) end
+    for i =1, #temp do 
+      if not data[ temp[i].pitch]  then data[ temp[i].pitch] = {} end
+      data[ temp[i].pitch][#data[ temp[i].pitch]+1] = temp[i] 
     end
   end
   ---------------------------------------------------
@@ -464,9 +481,12 @@
   ---------------------------------------------------
   function GetSampleNameByNote(note)
     local str = ''
-    for i = 1, #data do
-      if data[i].pitch == note then 
-        fn = GetShortSmplName(data[i].fn)
+    for key in pairs(data) do
+      if key == note then 
+        fn = ''
+        for i = 1, #data[key] do
+          fn = fn..GetShortSmplName(data[key][i].fn)          
+        end
         return fn, true
       end
     end
@@ -492,7 +512,8 @@
               }
               
     for i = 1, 12 do
-      local fn, ret = GetSampleNameByNote((i-1)+12*conf.oct_shift)
+      local note = (i-1)+12*conf.oct_shift
+      local fn, ret = GetSampleNameByNote(note)
       local col = 'white'
       if ret then col = 'green' end
       obj['keys_'..i] = 
@@ -503,14 +524,19 @@
                   h = key_h,
                   col = col,
                   state = 0,
-                  txt= GetNoteStr((i-1)+12*conf.oct_shift)..'\n\r'..fn,
-                  linked_note = (i-1)+12*conf.oct_shift,
+                  txt= GetNoteStr(note)..'\n\r'..fn,
+                  linked_note = note,
                   show = true,
                   is_but = true,
                   alpha_back = 0.2+ 0.2*shifts[i][2],
                   a_frame = 0.1,
                   aligh_txt = 5,
-                  fontsz = gui.fontsz2}       
+                  fontsz = gui.fontsz2,
+                  func =  function() 
+                            if obj[ mouse.context ] and obj[ mouse.context ].linked_note then
+                              StuffMIDIMessage( 0, '0x9'..string.format("%x", 0), obj[ mouse.context ].linked_note,100) 
+                            end
+                          end}       
     end
   end
   ---------------------------------------------------
@@ -766,15 +792,19 @@
     
     -- mouse release    
       if mouse.last_LMB_state and not mouse.LMB_state   then  
-        mouse.context_latch = ''
-        mouse.context_latch_val = 0
-        if action_export.state 
-          and obj[ mouse.context ] 
-          and obj[ mouse.context ].linked_note then
-            local note = obj[ mouse.context ].linked_note
-            ExportItemToRS5K(action_export.fn, note)
-        end
-        action_export = {}
+        -- clear context
+          mouse.context_latch = ''
+          mouse.context_latch_val = 0
+        -- clear export state
+          if action_export.state 
+            and obj[ mouse.context ] 
+            and obj[ mouse.context ].linked_note then
+              local note = obj[ mouse.context ].linked_note
+              ExportItemToRS5K(action_export.fn, note)
+          end
+          action_export = {}
+        -- clear note
+          for i = 1, 127 do StuffMIDIMessage( 0, '0x8'..string.format("%x", 0), i, 100) end
       end
       mouse.last_mx = mouse.mx
       mouse.last_my = mouse.my
@@ -789,10 +819,10 @@
   ---------------------------------------------------
   function ExportItemToRS5K(fn, note)
     local ex = false
-    for i = 1, #data do
-      if data[i].pitch == note then
-        TrackFX_SetNamedConfigParm(  data.tr_pointer, data[i].idx, 'FILE0', fn)
-        TrackFX_GetNamedConfigParm(  data.tr_pointer, data[i].idx, 'DONE', '') 
+    for key in pairs(data) do
+      if key == note then
+        TrackFX_SetNamedConfigParm(  data.tr_pointer, data[key][1].idx, 'FILE0', fn)
+        TrackFX_SetNamedConfigParm(  data.tr_pointer, data[key][1].idx, 'DONE', '') 
         redraw = 1
         ex = true
         break
@@ -801,7 +831,7 @@
     if not ex and data.tr_pointer then 
       local rs5k_pos = TrackFX_AddByName( data.tr_pointer, 'ReaSamplomatic5000', false, -1 )
       TrackFX_SetNamedConfigParm(  data.tr_pointer, rs5k_pos, 'FILE0', fn)
-      TrackFX_GetNamedConfigParm(  data.tr_pointer, rs5k_pos, 'DONE', '')      
+      TrackFX_SetNamedConfigParm(  data.tr_pointer, rs5k_pos, 'DONE', '')      
       reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 2, 0) -- gain for min vel
       reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 3, note/127 ) -- note range start
       reaper.TrackFX_SetParamNormalized( data.tr_pointer, rs5k_pos, 4, note/127 ) -- note range end
