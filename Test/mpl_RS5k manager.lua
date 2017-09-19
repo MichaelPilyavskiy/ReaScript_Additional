@@ -18,6 +18,7 @@
                     Keys: show linked samples
                     Keys: MIDI prepare track if at least one RS5K instance found
                     Data: sort data table by MIDI note (for potential support layer), currently replacing sample
+  19.09.2017  0.14  Patterns: GUI prepare                    
   ]]
   
   --NOT gfx NOT reaper
@@ -27,6 +28,7 @@
   local mouse = {}
   local obj = {}
   conf = {}
+  pat = {}
   local data = {}
   local action_export = {}
   local redraw = -1
@@ -324,12 +326,20 @@
     end    
   end
   ---------------------------------------------------
+  function ExtState_Load_Patterns()
+    pat = {}
+    local retval, valOutNeedBig = GetProjExtState( 0, conf.ES_key, 'PAT' )
+  end
+  ---------------------------------------------------
   local function OBJ_define()  
     obj.offs = 2
     obj.grad_sz = 200
     obj.item_h = 30   
-    obj.item_h2 = 15
+    obj.item_h2 = 20
+    obj.item_h3 = 15
     obj.scroll_w = 15
+    obj.it_alpha = 0.35 -- under tab
+    obj.it_alpha2 = 0.24 -- navigation
     
     obj.slider = { x = 0,
                 y = 0,
@@ -410,193 +420,82 @@
       local cnt_it = OBJ_GenSampleBrowser()
       if conf.keymode == 0 then OBJ_GenKeys() end
       obj.scroll.steps = cnt_it
+     elseif conf.tab == 1 then 
+      local cnt_it = OBJ_GenPatternBrowser()
+      obj.scroll.steps = cnt_it      
     end
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
   end
 -----------------------------------------------------------------------    
-  function GetNoteStr(val) 
-    local oct_shift = conf.oct_shift-7
-    if conf.key_names == 0 then
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end
-     elseif conf.key_names == 1 then
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B',}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
-     elseif conf.key_names == 2 then
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si',}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end      
-     elseif conf.key_names == 3 then
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Si',}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end       
-     elseif conf.key_names == 4 -- midi pitch
-      then return val
-     elseif 
-      conf.key_names == 5 -- freq
-      then return math.floor(440 * 2 ^ ( (val - 69) / 12))..'Hz'
-     elseif 
-      conf.key_names == 6 -- empty
-      then return ''
-     elseif 
-      conf.key_names == 7 then -- ru
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'До', 'До#', 'Ре', 'Ре#', 'Ми', 'Фа', 'Фа#', 'Соль', 'Соль#', 'Ля', 'Ля#', 'Си'}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
-     elseif conf.key_names == 8 then
-      if not val then return end
-      local val = math.floor(val)
-      local oct = math.floor(val / 12)
-      local note = math.fmod(val,  12)
-      local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
-      if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift..'\n'..val end              
-    end
-  end
-  ---------------------------------------------------
-  function GetShortSmplName(path)
-    local fn = path
-    fn = fn:gsub('%\\','/')
-    if fn then fn = fn:reverse():match('(.-)/') end
-    if fn then fn = fn:reverse() end
-    if fn then fn = fn:match('(.*).wav') end
-    return fn
-  end
-  ---------------------------------------------------
-  function GetSampleNameByNote(note)
-    local str = ''
-    for key in pairs(data) do
-      if key == note then 
-        fn = ''
-        for i = 1, #data[key] do
-          fn = fn..GetShortSmplName(data[key][i].fn)          
-        end
-        return fn, true
-      end
-    end
-    return str
-  end
-  ---------------------------------------------------
-  function OBJ_GenKeys()
-    local opt_h = obj.item_h +  1 + obj.item_h2 + 1
-    local key_w = math.ceil(obj.workarea.w/7)
-    local key_h = math.ceil(0.5*(gfx.h - opt_h))
-    local shifts  = {{0,1},
-                {0.5,0},
-                {1,1},
-                {1.5,0},
-                {2,1},
-                {3,1},
-                {3.5,0},
-                {4,1},
-                {4.5,0},
-                {5,1},
-                {5.5,0},
-                {6,1},
-              }
-              
-    for i = 1, 12 do
-      local note = (i-1)+12*conf.oct_shift
-      local fn, ret = GetSampleNameByNote(note)
-      local col = 'white'
-      if ret then col = 'green' end
-      obj['keys_'..i] = 
-                { clear = true,
-                  x = obj.workarea.x+shifts[i][1]*key_w,
-                  y = opt_h+ shifts[i][2]*key_h,
-                  w = key_w,
-                  h = key_h,
-                  col = col,
-                  state = 0,
-                  txt= GetNoteStr(note)..'\n\r'..fn,
-                  linked_note = note,
-                  show = true,
-                  is_but = true,
-                  alpha_back = 0.2+ 0.2*shifts[i][2],
-                  a_frame = 0.1,
-                  aligh_txt = 5,
-                  fontsz = gui.fontsz2,
-                  func =  function() 
-                            if obj[ mouse.context ] and obj[ mouse.context ].linked_note then
-                              StuffMIDIMessage( 0, '0x9'..string.format("%x", 0), obj[ mouse.context ].linked_note,100) 
-                            end
-                          end}       
-    end
-  end
-  ---------------------------------------------------
-  function GetParentFolder(dir) return dir:match('(.*)[%\\/]') end
-  ---------------------------------------------------
-  function Menu_FormBrowser()                   
-    local browser_t =
-                                  {
-                                    {str = 'Browse for file/path',
-                                    func = function()
-                                              local ret, fn = GetUserFileNameForRead('', 'Browse for file/path', '.wav' )
-                                              if ret then
-                                                local par_fold = GetParentFolder(fn)
-                                                if par_fold then 
-                                                  conf.cur_smpl_browser_dir = par_fold 
-                                                  ExtState_Save()
-                                                  redraw = 1                                             
-                                                end
-                                              end
-                                            end
-                                    },                                
-                                    {str = '|>Save as favourite|1 - '..conf.smpl_browser_fav_path1,
-                                    func = function()
-                                              conf.smpl_browser_fav_path1 = conf.cur_smpl_browser_dir
-                                              ExtState_Save()
-                                              redraw = 1 
-                                            end
-                                    }
-                                  }
-    -- save favourite 
-    for i = 2, conf.fav_path_cnt  do
-      if conf['smpl_browser_fav_path'..i] then 
-        if i == conf.fav_path_cnt or not conf['smpl_browser_fav_path'..i+1] then close = '<' else close = '' end
-        browser_t[#browser_t+1] = { str = close..i..' - '..conf['smpl_browser_fav_path'..i],
-                                  func = function()
-                                    conf['smpl_browser_fav_path'..i] = conf.cur_smpl_browser_dir
-                                    ExtState_Save()
-                                    redraw = 1 
-                                  end
-                                }
-      end
-    end 
-    -- load favourite
-    for i = 1, conf.fav_path_cnt  do
-      if conf['smpl_browser_fav_path'..i] then
-        browser_t[#browser_t+1] = { str = 'Fav'..i..' - '..conf['smpl_browser_fav_path'..i],
-                                  func = function()
-                                    conf.cur_smpl_browser_dir = conf['smpl_browser_fav_path'..i]
-                                    ExtState_Save()
-                                    redraw = 1 
-                                  end
-                                }    
-      end
-    end
-    return  browser_t
+  function OBJ_GenPatternBrowser()
+    local up_w = 40
+    obj.pat_new = { clear = true,
+                  x = obj.browser.x,
+                y = obj.browser.y,
+                w = up_w,
+                h = obj.item_h2,
+                col = 'white',
+                state = 0,
+                txt= 'New',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha2,
+                func =  function() 
+                          
+                        end} 
+    obj.pat_dupl = { clear = true,
+                  x = obj.browser.x+up_w+1,
+                y = obj.browser.y,
+                w = up_w,
+                h = obj.item_h2,
+                col = 'white',
+                state = 0,
+                txt= 'Dupl',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha2,
+                func =  function() 
+                          
+                        end}    
+    obj.pat_rem = { clear = true,
+                  x = obj.browser.x+(up_w+1)*2,
+                y = obj.browser.y,
+                w = up_w,
+                h = obj.item_h2,
+                col = 'white',
+                state = 0,
+                txt= 'Del',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha2,
+                func =  function() 
+                          
+                        end}   
+    obj.pat_current = { clear = true,
+                  x = obj.browser.x+(up_w+1)*3,
+                y = obj.browser.y,
+                w = lim(obj.browser.w-(up_w+1)*3,up_w, math.huge),
+                h = obj.item_h2,
+                col = 'white',
+                state = 0,
+                txt= '(current)',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha,
+                func =  function() 
+                          
+                        end}                                                                       
+    local list_cnt = 100 --   TEST
+    local cnt = lim((gfx.h-obj.browser.h)/list_cnt, 2, math.huge)
+    return cnt
   end
   ---------------------------------------------------
   function OBJ_GenSampleBrowser()
-    local it_alpha = 0.3
-    local up_w = 20
+    local up_w = 25
     obj.browser_up = { clear = true,
                   x = obj.browser.x,
                 y = obj.browser.y,
@@ -608,7 +507,7 @@
                 show = true,
                 is_but = true,
                 fontsz = gui.fontsz2,
-                alpha_back = it_alpha,
+                alpha_back = obj.it_alpha2,
                 func =  function() 
                           local path = GetParentFolder(conf.cur_smpl_browser_dir) 
                           if path then 
@@ -629,7 +528,7 @@
                 show = true,
                 is_but = true,
                 fontsz = gui.fontsz2,
-                alpha_back = it_alpha,
+                alpha_back = obj.it_alpha,
                 func =  function() Menu(Menu_FormBrowser()) end}
     local cur_dir_list = GetDirList(conf.cur_smpl_browser_dir)
     blit_h = #cur_dir_list*obj.item_h2 + obj.browser.y
@@ -640,9 +539,9 @@
       obj['browser_dirlist'..i] = 
                 { clear = true,
                   x = obj.browser.x,
-                  y = obj.browser.y + 1  + obj.item_h2+(i-1)*obj.item_h2,
+                  y = obj.browser.y + 1  + obj.item_h2+(i-1)*obj.item_h3,
                   w = obj.tab_div-obj.scroll_w,
-                  h = obj.item_h2,
+                  h = obj.item_h3,
                   col = 'white',
                   state = 0,
                   txt= txt,
@@ -670,6 +569,186 @@
     local cnt = lim((gfx.h-obj.browser.h)/#cur_dir_list, 2, math.huge)
     return cnt
   end
+  -----------------------------------------------------------------------    
+    function GetNoteStr(val) 
+      local oct_shift = conf.oct_shift-7
+      if conf.key_names == 0 then
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end
+       elseif conf.key_names == 1 then
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B',}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
+       elseif conf.key_names == 2 then
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si',}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end      
+       elseif conf.key_names == 3 then
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Si',}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end       
+       elseif conf.key_names == 4 -- midi pitch
+        then return val
+       elseif 
+        conf.key_names == 5 -- freq
+        then return math.floor(440 * 2 ^ ( (val - 69) / 12))..'Hz'
+       elseif 
+        conf.key_names == 6 -- empty
+        then return ''
+       elseif 
+        conf.key_names == 7 then -- ru
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'До', 'До#', 'Ре', 'Ре#', 'Ми', 'Фа', 'Фа#', 'Соль', 'Соль#', 'Ля', 'Ля#', 'Си'}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
+       elseif conf.key_names == 8 then
+        if not val then return end
+        local val = math.floor(val)
+        local oct = math.floor(val / 12)
+        local note = math.fmod(val,  12)
+        local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift..'\n'..val end              
+      end
+    end
+    ---------------------------------------------------
+    function GetShortSmplName(path)
+      local fn = path
+      fn = fn:gsub('%\\','/')
+      if fn then fn = fn:reverse():match('(.-)/') end
+      if fn then fn = fn:reverse() end
+      if fn then fn = fn:match('(.*).wav') end
+      return fn
+    end
+    ---------------------------------------------------
+    function GetSampleNameByNote(note)
+      local str = ''
+      for key in pairs(data) do
+        if key == note then 
+          local fn = ''
+          for i = 1, #data[key] do
+            fn = fn..GetShortSmplName(data[key][i].fn)          
+          end
+          return fn, true
+        end
+      end
+      return str
+    end
+    ---------------------------------------------------
+    function OBJ_GenKeys()
+      local opt_h = obj.item_h +  1 + obj.item_h2 + 1
+      local key_w = math.ceil(obj.workarea.w/7)
+      local key_h = math.ceil(0.5*(gfx.h - opt_h))
+      local shifts  = {{0,1},
+                  {0.5,0},
+                  {1,1},
+                  {1.5,0},
+                  {2,1},
+                  {3,1},
+                  {3.5,0},
+                  {4,1},
+                  {4.5,0},
+                  {5,1},
+                  {5.5,0},
+                  {6,1},
+                }
+                
+      for i = 1, 12 do
+        local note = (i-1)+12*conf.oct_shift
+        local fn, ret = GetSampleNameByNote(note)
+        local col = 'white'
+        if ret then col = 'green' end
+        obj['keys_'..i] = 
+                  { clear = true,
+                    x = obj.workarea.x+shifts[i][1]*key_w,
+                    y = opt_h+ shifts[i][2]*key_h,
+                    w = key_w,
+                    h = key_h,
+                    col = col,
+                    state = 0,
+                    txt= GetNoteStr(note)..'\n\r'..fn,
+                    linked_note = note,
+                    show = true,
+                    is_but = true,
+                    alpha_back = 0.2+ 0.2*shifts[i][2],
+                    a_frame = 0.1,
+                    aligh_txt = 5,
+                    fontsz = gui.fontsz2,
+                    func =  function() 
+                              if obj[ mouse.context ] and obj[ mouse.context ].linked_note then
+                                StuffMIDIMessage( 0, '0x9'..string.format("%x", 0), obj[ mouse.context ].linked_note,100) 
+                              end
+                            end}       
+      end
+    end
+    ---------------------------------------------------
+    function GetParentFolder(dir) return dir:match('(.*)[%\\/]') end
+    ---------------------------------------------------
+    function Menu_FormBrowser()                   
+      local browser_t =
+                                    {
+                                      {str = 'Browse for file/path',
+                                      func = function()
+                                                local ret, fn = GetUserFileNameForRead('', 'Browse for file/path', '.wav' )
+                                                if ret then
+                                                  local par_fold = GetParentFolder(fn)
+                                                  if par_fold then 
+                                                    conf.cur_smpl_browser_dir = par_fold 
+                                                    ExtState_Save()
+                                                    redraw = 1                                             
+                                                  end
+                                                end
+                                              end
+                                      },                                
+                                      {str = '|>Save as favourite|1 - '..conf.smpl_browser_fav_path1,
+                                      func = function()
+                                                conf.smpl_browser_fav_path1 = conf.cur_smpl_browser_dir
+                                                ExtState_Save()
+                                                redraw = 1 
+                                              end
+                                      }
+                                    }
+      -- save favourite 
+      for i = 2, conf.fav_path_cnt  do
+        if conf['smpl_browser_fav_path'..i] then 
+          if i == conf.fav_path_cnt or not conf['smpl_browser_fav_path'..i+1] then close = '<' else close = '' end
+          browser_t[#browser_t+1] = { str = close..i..' - '..conf['smpl_browser_fav_path'..i],
+                                    func = function()
+                                      conf['smpl_browser_fav_path'..i] = conf.cur_smpl_browser_dir
+                                      ExtState_Save()
+                                      redraw = 1 
+                                    end
+                                  }
+        end
+      end 
+      -- load favourite
+      for i = 1, conf.fav_path_cnt  do
+        if conf['smpl_browser_fav_path'..i] then
+          browser_t[#browser_t+1] = { str = 'Fav'..i..' - '..conf['smpl_browser_fav_path'..i],
+                                    func = function()
+                                      conf.cur_smpl_browser_dir = conf['smpl_browser_fav_path'..i]
+                                      ExtState_Save()
+                                      redraw = 1 
+                                    end
+                                  }    
+        end
+      end
+      return  browser_t
+    end
   ---------------------------------------------------
   function GetSampleToExport(fn)
     action_export = {state = true,
@@ -873,6 +952,7 @@
   end
   ---------------------------------------------------
   ExtState_Load()  
+  ExtState_Load_Patterns()
   gfx.init('MPL '..scr_title,
             conf.wind_w, 
             conf.wind_h, 
