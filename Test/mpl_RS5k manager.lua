@@ -10,7 +10,8 @@
   15.09.2017  0.1   basic gui
                     tabs
                     basic browser content
-  16.09.2017  0.13  SampleBrowser: browse for file
+  16.09.2017  0.13  SampleBrowser
+                    SampleBrowser: browse for file
                     SampleBrowser: favourites Save/Load
                     SampleBrowser: scroll by wheel   
                     SampleBrowser: drag n drop to keys (export to rs5k)
@@ -18,7 +19,9 @@
                     Keys: show linked samples
                     Keys: MIDI prepare track if at least one RS5K instance found
                     Data: sort data table by MIDI note (for potential support layer), currently replacing sample
-  19.09.2017  0.14  Patterns: GUI prepare                    
+  19.09.2017  0.14  Patterns: GUI prepare   
+  23.09.2017  0.15  PatternBrowser
+                    SampleBrowser/PatternBrowser: limit items cnt down to 2              
   ]]
   
   --NOT gfx NOT reaper
@@ -39,6 +42,8 @@
                 font = 'Calibri',
                 fontsz = 20,
                 fontsz2 = 14,
+                a1 = 0.2, -- pat not sel
+                a2 = 0.4, -- pat sel
                 col = { grey =    {0.5, 0.5,  0.5 },
                         white =   {1,   1,    1   },
                         red =     {1,   0,    0   },
@@ -72,7 +77,9 @@
             -- Pads
             keymode = 0,
             oct_shift = 5,
-            key_names = 8
+            key_names = 8,
+            -- Patterns
+            default_steps = 16
             }
     for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
     return t
@@ -100,7 +107,7 @@
            end
   end
   ---------------------------------------------------
-  local function msg(s)  ShowConsoleMsg(os.date()..' '..s..'\n') end
+  local function msg(s) if not s then return end ShowConsoleMsg(os.date()..' '..s..'\n') end
   ---------------------------------------------------
   local function col(col_s, a) gfx.set( table.unpack(gui.col[col_s])) if a then gfx.a = a end  end
   ---------------------------------------------------
@@ -173,8 +180,9 @@
       gfx.x,gfx.y = x+w-1,y
       gfx.lineto(x+1,y)
     end    
-    
+    return true
   end
+  ---------------------------------------------------
   function math_q(num)  if math.abs(num - math.floor(num)) < math.abs(num - math.ceil(num)) then return math.floor(num) else return math.ceil(num) end end
   ---------------------------------------------------
   function MIDI_prepare(tr)
@@ -267,7 +275,8 @@
             gfx.setimgdim(3, obj.tab_div, blit_h) 
             for key in pairs(obj) do 
               if type(obj[key]) == 'table' and obj[key].show and obj[key].blit then 
-                GUI_DrawObj(obj[key]) 
+                local ret = GUI_DrawObj(obj[key])
+                --if ret then msg('s') end
               end  
             end    
           end
@@ -328,7 +337,46 @@
   ---------------------------------------------------
   function ExtState_Load_Patterns()
     pat = {}
-    local retval, valOutNeedBig = GetProjExtState( 0, conf.ES_key, 'PAT' )
+    local ret, str = GetProjExtState( 0, conf.ES_key, 'PAT' )
+    if not ret then return end
+    -- parse patterns
+      for line in str:gmatch('<PAT[\n\r](.-)>') do   
+        pat[#pat+1] = {}     
+        for l2 in line:gmatch('[^\r\n]+') do          
+          local key = l2:match('[%a]+')
+          local val = l2:match('[%a][%s](.*)')
+          if tonumber(val) then val = tonumber(val) end
+          pat[#pat][key] = val
+        end
+      end
+    -- parse params
+      for line in str:gmatch('[^\r\n]+') do 
+        if line:find('[%a]+ [%d]+') and line:find('[%a]+ [%d]+') == 1 then 
+          local key = line:match('[%a]+')
+          local val = line:match('[%d]+') if val then val = tonumber(val) end
+          pat[key] = val
+        end 
+      end
+  end
+  ---------------------------------------------------
+  function ExtState_Save_Patterns()
+    local str = '//MPL_RS5K_PATLIST'
+    local ind = '   '
+    for k,v in spairs(pat, function(t,a,b) return tostring(b):lower() > tostring(a):lower() end) do 
+    --for k in pairs(pat) do 
+      if tonumber(k) then
+        local pat_t = pat[k]
+        str = str..'\n<PAT'
+        for key in pairs(pat_t) do
+          str = str..'\n'..ind..key..' '..pat_t[key]
+        end
+        str = str..'\n>'
+       else
+        str = str..'\n'..k..' '..pat[k]
+      end
+    end  
+    msg('\nSAVE\n'..str)
+    SetProjExtState( 0, conf.ES_key, 'PAT', str )
   end
   ---------------------------------------------------
   local function OBJ_define()  
@@ -442,7 +490,12 @@
                 fontsz = gui.fontsz2,
                 alpha_back = obj.it_alpha2,
                 func =  function() 
-                          
+                          local insert_at_index = #pat+1
+                          table.insert(pat,insert_at_index,{NAME='pat'..insert_at_index,
+                                                            GUID=genGuid('')})
+                          pat.SEL = insert_at_index
+                          ExtState_Save_Patterns()
+                          redraw = 1
                         end} 
     obj.pat_dupl = { clear = true,
                   x = obj.browser.x+up_w+1,
@@ -457,7 +510,6 @@
                 fontsz = gui.fontsz2,
                 alpha_back = obj.it_alpha2,
                 func =  function() 
-                          
                         end}    
     obj.pat_rem = { clear = true,
                   x = obj.browser.x+(up_w+1)*2,
@@ -472,8 +524,15 @@
                 fontsz = gui.fontsz2,
                 alpha_back = obj.it_alpha2,
                 func =  function() 
-                          
+                          if pat.SEL and pat[pat.SEL] then 
+                            table.remove(pat, pat.SEL)
+                            if not pat[pat.SEL] then for i = pat.SEL, 1, -1 do if pat[i] then pat.SEL = i break end end                           end
+                            ExtState_Save_Patterns()
+                            redraw = 1
+                          end
                         end}   
+    local cur_pat_name = '(not selected)'
+    if pat.SEL and pat[pat.SEL] then cur_pat_name = pat[pat.SEL].NAME end
     obj.pat_current = { clear = true,
                   x = obj.browser.x+(up_w+1)*3,
                 y = obj.browser.y,
@@ -481,16 +540,45 @@
                 h = obj.item_h2,
                 col = 'white',
                 state = 0,
-                txt= '(current)',
+                txt= cur_pat_name ,
                 show = true,
                 is_but = true,
                 fontsz = gui.fontsz2,
                 alpha_back = obj.it_alpha,
                 func =  function() 
                           
-                        end}                                                                       
-    local list_cnt = 100 --   TEST
-    local cnt = lim((gfx.h-obj.browser.h)/list_cnt, 2, math.huge)
+                        end}      
+    local p_cnt = 2
+    if #pat > 2 then p_cnt = #pat + 1 end
+    blit_h = p_cnt*obj.item_h2 + obj.browser.y
+    obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))                                                                     
+    for i = 1, #pat do 
+      local a = 0.2
+      if pat.SEL and i == pat.SEL then a = gui.a2 end
+      obj['patlist'..i] = 
+                { clear = true,
+                  x = obj.browser.x,
+                  y = obj.browser.y + 1  + obj.item_h2+(i-1)*obj.item_h3,
+                  w = obj.tab_div-obj.scroll_w- 1,
+                  h = obj.item_h3,
+                  col = 'white',
+                  state = 1,
+                  txt= pat[i].NAME,
+                  --aligh_txt = 1,
+                  blit = true,
+                  show = true,
+                  is_but = true,
+                  fontsz = gui.fontsz2,
+                  alpha_back = a,
+                  --a_line = 0,
+                  mouse_offs_y = obj.blit_y_src,
+                  func =  function() 
+                            pat.SEL = i
+                            ExtState_Save_Patterns()
+                            redraw = 1
+                          end}    
+    end
+    local cnt = lim((gfx.h-obj.browser.h)/p_cnt, 2, math.huge)
     return cnt
   end
   ---------------------------------------------------
@@ -531,7 +619,9 @@
                 alpha_back = obj.it_alpha,
                 func =  function() Menu(Menu_FormBrowser()) end}
     local cur_dir_list = GetDirList(conf.cur_smpl_browser_dir)
-    blit_h = #cur_dir_list*obj.item_h2 + obj.browser.y
+    local list_cnt = 2
+    if #cur_dir_list > 2 then list_cnt = #cur_dir_list end
+    blit_h = list_cnt*obj.item_h2 + obj.browser.y
     obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))
     for i = 1, #cur_dir_list do
       local txt = cur_dir_list[i][1]
@@ -566,7 +656,7 @@
                             end
                           end}    
     end
-    local cnt = lim((gfx.h-obj.browser.h)/#cur_dir_list, 2, math.huge)
+    local cnt = lim((gfx.h-obj.browser.h)/list_cnt, 2, math.huge)
     return cnt
   end
   -----------------------------------------------------------------------    
@@ -951,6 +1041,7 @@
     if gfx.getchar() >= 0 then defer(run) else atexit(gfx.quit) end
   end
   ---------------------------------------------------
+  ClearConsole()
   ExtState_Load()  
   ExtState_Load_Patterns()
   gfx.init('MPL '..scr_title,
