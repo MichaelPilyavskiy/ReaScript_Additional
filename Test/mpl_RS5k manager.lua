@@ -20,10 +20,11 @@
                     Keys: MIDI prepare track if at least one RS5K instance found
                     Data: sort data table by MIDI note (for potential support layer), currently replacing sample
   19.09.2017  0.14  Patterns: GUI prepare   
-  23.09.2017  0.15  PatternBrowser
-                    SampleBrowser/PatternBrowser: limit items cnt down to 2              
+  23.09.2017  0.16  PatternBrowser
+                    StepSequencer sketch
+                    
   ]]
-  
+  local vrs = 'v0.16alpha'
   --NOT gfx NOT reaper
   local scr_title = 'RS5K manager'
   --  INIT -------------------------------------------------
@@ -32,10 +33,10 @@
   local obj = {}
   conf = {}
   pat = {}
-  local data = {}
+  data = {}
   local action_export = {}
   local redraw = -1
-  local blit_h,slider_val = 0,0
+  local blit_h,slider_val,blit_h2,slider_val2 = 0,0,0,0
   local gui = {
                 aa = 1,
                 mode = 0,
@@ -43,13 +44,12 @@
                 fontsz = 20,
                 fontsz2 = 14,
                 a1 = 0.2, -- pat not sel
-                a2 = 0.4, -- pat sel
+                a2 = 0.45, -- pat sel
                 col = { grey =    {0.5, 0.5,  0.5 },
                         white =   {1,   1,    1   },
                         red =     {1,   0,    0   },
                         green =   {0.3,   0.9,    0.3   }
                       }
-                
                 }
     
   if GetOS():find("OSX") then 
@@ -72,7 +72,7 @@
             -- GUI control
             mouse_wheel_res = 960,
             -- Samples
-            cur_smpl_browser_dir =  GetResourcePath():gsub('\\','/'),
+            cur_smpl_browser_dir = GetResourcePath():gsub('\\','/'),
             fav_path_cnt = 4,
             -- Pads
             keymode = 0,
@@ -107,7 +107,7 @@
            end
   end
   ---------------------------------------------------
-  local function msg(s) if not s then return end ShowConsoleMsg(os.date()..' '..s..'\n') end
+  local function msg(s) if not s then return end ShowConsoleMsg('==================\n'..os.date()..'\n'..s..'\n') end
   ---------------------------------------------------
   local function col(col_s, a) gfx.set( table.unpack(gui.col[col_s])) if a then gfx.a = a end  end
   ---------------------------------------------------
@@ -137,12 +137,13 @@
     
     -- txt
     if o.txt then 
+      local txt = tostring(o.txt)
       col('white', o.alpha_txt or 0.8)
       local f_sz = gui.fontsz
       gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
       local y_shift = 0
-      for line in o.txt:gmatch('[^\r\n]+') do
-        if gfx.measurestr(line) > w then 
+      for line in txt:gmatch('[^\r\n]+') do
+        if gfx.measurestr(line:sub(2)) > w -2 and w > 20 then 
           repeat line = line:sub(2) until gfx.measurestr(line..'...')< w -2
           line = '...'..line
         end
@@ -225,7 +226,7 @@
     -- 1 back
     -- 2 gradient
     -- 3 smpl browser blit
-      
+    -- 4 stepseq 
     --  init
       if redraw == -1 then
         Data_Update()
@@ -268,18 +269,28 @@
               GUI_DrawObj(obj[key]) 
             end  
           end  
-        -- refresh blit list 
+        -- refresh blit list 1
           if blit_h then
             gfx.dest = 3
             gfx.setimgdim(3, -1, -1)  
             gfx.setimgdim(3, obj.tab_div, blit_h) 
-            for key in pairs(obj) do 
-              if type(obj[key]) == 'table' and obj[key].show and obj[key].blit then 
+            for key in spairs(obj) do 
+              if type(obj[key]) == 'table' and obj[key].show and obj[key].blit and obj[key].blit== 3 then 
                 local ret = GUI_DrawObj(obj[key])
-                --if ret then msg('s') end
               end  
             end    
           end
+        -- refresh blit list 2
+          if blit_h2 then
+            gfx.dest = 4
+            gfx.setimgdim(4, -1, -1)  
+            gfx.setimgdim(4, obj.workarea.w-obj.scroll_w-1, blit_h2) 
+            for key in spairs(obj) do 
+              if type(obj[key]) == 'table' and obj[key].show and obj[key].blit and obj[key].blit== 4 then 
+                local ret = GUI_DrawObj(obj[key])
+              end  
+            end    
+          end          
       end
       
       
@@ -294,10 +305,31 @@
     --  blit browser
       if blit_h and obj.blit_y_src then
         gfx.blit(3, 1, 0, -- backgr
-          0,  obj.blit_y_src+obj.browser.y+obj.item_h2, obj.tab_div, blit_h,
-          0,  obj.browser.y+obj.item_h2,              obj.tab_div, blit_h, 0,0) 
+          0,  
+          obj.blit_y_src+obj.browser.y+obj.item_h2, 
+          obj.tab_div, 
+          blit_h,
+          0,  
+          obj.browser.y+obj.item_h2,              
+          obj.tab_div, 
+          blit_h, 
+          0,0) 
       end    
-    
+    --  blit stepseq
+      if blit_h2 and obj.blit_y_src2 then
+        gfx.blit(4, 1, 0, -- backgr
+          0,  
+          obj.blit_y_src2, 
+          obj.workarea.w, 
+          blit_h2,
+          
+          obj.workarea.x,  
+          obj.workarea.y+obj.item_h+obj.item_h2 +2,              
+          obj.workarea.w, 
+          blit_h2, 
+          0,0) 
+      end 
+          
     -- drag&drop item to keys
       if action_export.state then
         local name = GetShortSmplName(action_export.fn)
@@ -379,12 +411,28 @@
     SetProjExtState( 0, conf.ES_key, 'PAT', str )
   end
   ---------------------------------------------------
+  function CopyTable(orig)--http://lua-users.org/wiki/CopyTable
+      local orig_type = type(orig)
+      local copy
+      if orig_type == 'table' then
+          copy = {}
+          for orig_key, orig_value in next, orig, nil do
+              copy[CopyTable(orig_key)] = CopyTable(orig_value)
+          end
+          setmetatable(copy, CopyTable(getmetatable(orig)))
+      else -- number, string, boolean, etc
+          copy = orig
+      end
+      return copy
+  end
+  ---------------------------------------------------
   local function OBJ_define()  
     obj.offs = 2
     obj.grad_sz = 200
-    obj.item_h = 30   
-    obj.item_h2 = 20
-    obj.item_h3 = 15
+    obj.item_h = 30  -- tabs
+    obj.item_h2 = 20 -- list header
+    obj.item_h3 = 15 -- list items
+    obj.item_h4 = 40 -- steseq
     obj.scroll_w = 15
     obj.it_alpha = 0.35 -- under tab
     obj.it_alpha2 = 0.24 -- navigation
@@ -470,11 +518,68 @@
       obj.scroll.steps = cnt_it
      elseif conf.tab == 1 then 
       local cnt_it = OBJ_GenPatternBrowser()
-      obj.scroll.steps = cnt_it      
+      obj.scroll.steps = cnt_it   
+      local cnt_it2 = OBJ_GenStepSequencer() 
+      obj.scroll2 =  {clear = true,
+                  x = gfx.w - obj.scroll_w,
+                  y = obj.item_h+2+obj.item_h2,
+                  w = obj.scroll_w,
+                  h = gfx.h-obj.item_h-obj.item_h2-3,
+                  col = 'white',
+                  show = true,
+                  state = 0,
+                  alpha_back = 0.4,
+                  mouse_scale = 100,
+                  axis = 'y',
+                  val = slider_val2 ,
+                  is_slider = true,
+                  func =  function(val) 
+                            slider_val2 = lim(val, 0,1) 
+                            redraw = 1
+                          end}  
     end
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
   end
------------------------------------------------------------------------    
+-----------------------------------------------------------------------  
+  function OBJ_GenStepSequencer()
+    local s_cnt = 0
+    for i = 1, 127 do
+      if data[i] then 
+        s_cnt = s_cnt + 1
+      end
+    end
+    blit_h2 = s_cnt*obj.item_h4 + obj.workarea.y + obj.item_h2
+    obj.blit_y_src2 = math.floor(slider_val2*(blit_h2-obj.item_h2*2-obj.item_h))  
+    local cnt = 0          
+    for i = 1, 127 do
+      if data[i] then 
+        cnt = cnt + 1 
+        local a = 0.2
+        obj['stseq'..i] = {  clear = true,
+                  x = 0,
+                  y = (cnt-1)*obj.item_h4,
+                  w =  obj.workarea.w-obj.scroll_w,
+                  h = obj.item_h4,
+                  col = 'white',
+                  state = 1,
+                  txt= i,
+                  aligh_txt = 1,
+                  blit = 4,
+                  show = true,
+                  is_but = true,
+                  fontsz = gui.fontsz2,
+                  alpha_back = 0.4,
+                  --a_line = 0,
+                  mouse_offs_y = obj.blit_y_src2,
+                  func =  function() 
+                            
+                          end}
+      end    
+    end
+    --local cnt = lim((gfx.h-obj.browser.h)/s_cnt, 2, math.huge)
+    return cnt
+  end  
+-----------------------------------------------------------------------   
   function OBJ_GenPatternBrowser()
     local up_w = 40
     obj.pat_new = { clear = true,
@@ -510,6 +615,15 @@
                 fontsz = gui.fontsz2,
                 alpha_back = obj.it_alpha2,
                 func =  function() 
+                          if not pat.SEL or not pat[ pat.SEL ] then return end
+                          local insert_at_index = pat.SEL+1
+                          table.insert(pat,insert_at_index,{NAME='pat'..insert_at_index})
+                                                            --GUID=genGuid('')})                          
+                          pat[insert_at_index] = CopyTable(pat[ pat.SEL ])
+                          pat[insert_at_index].GUID=genGuid('')
+                          pat.SEL = insert_at_index
+                          ExtState_Save_Patterns()
+                          redraw = 1                          
                         end}    
     obj.pat_rem = { clear = true,
                   x = obj.browser.x+(up_w+1)*2,
@@ -548,10 +662,10 @@
                 func =  function() 
                           
                         end}      
-    local p_cnt = 2
-    if #pat > 2 then p_cnt = #pat + 1 end
-    blit_h = p_cnt*obj.item_h2 + obj.browser.y
-    obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))                                                                     
+    local p_cnt = #pat
+    --if #pat > 1 then p_cnt = #pat end
+    blit_h = p_cnt*obj.item_h3 + obj.browser.y + obj.item_h2
+    obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))            
     for i = 1, #pat do 
       local a = 0.2
       if pat.SEL and i == pat.SEL then a = gui.a2 end
@@ -565,7 +679,7 @@
                   state = 1,
                   txt= pat[i].NAME,
                   --aligh_txt = 1,
-                  blit = true,
+                  blit = 3,
                   show = true,
                   is_but = true,
                   fontsz = gui.fontsz2,
@@ -601,6 +715,7 @@
                           if path then 
                             conf.cur_smpl_browser_dir = path 
                             ExtState_Save()
+                            slider_val = 0
                             redraw = 1
                           end
                         end} 
@@ -619,9 +734,9 @@
                 alpha_back = obj.it_alpha,
                 func =  function() Menu(Menu_FormBrowser()) end}
     local cur_dir_list = GetDirList(conf.cur_smpl_browser_dir)
-    local list_cnt = 2
-    if #cur_dir_list > 2 then list_cnt = #cur_dir_list end
-    blit_h = list_cnt*obj.item_h2 + obj.browser.y
+    local list_cnt = #cur_dir_list
+    --if #cur_dir_list > 2 then list_cnt = #cur_dir_list end
+    blit_h = list_cnt*obj.item_h3 + obj.browser.y + obj.item_h
     obj.blit_y_src = math.floor(slider_val*(blit_h-obj.item_h2*2-obj.item_h))
     for i = 1, #cur_dir_list do
       local txt = cur_dir_list[i][1]
@@ -637,7 +752,7 @@
                   txt= txt,
                   txt2=txt2,
                   aligh_txt = 1,
-                  blit = true,
+                  blit = 3,
                   show = true,
                   is_but = true,
                   fontsz = gui.fontsz2,
@@ -958,7 +1073,13 @@
         slider_val = lim(slider_val - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
         redraw = 1
       end
-    
+
+    -- scroll stepseq
+      if mouse.mx < obj.workarea.x + obj.workarea.w  and mouse.wheel_trig and mouse.wheel_trig ~= 0 then
+        slider_val2 = lim(slider_val2 - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
+        redraw = 1
+      end
+          
     -- mouse release    
       if mouse.last_LMB_state and not mouse.LMB_state   then  
         -- clear context
@@ -1044,7 +1165,7 @@
   ClearConsole()
   ExtState_Load()  
   ExtState_Load_Patterns()
-  gfx.init('MPL '..scr_title,
+  gfx.init('MPL '..scr_title..' '..vrs,
             conf.wind_w, 
             conf.wind_h, 
             conf.dock, conf.wind_x, conf.wind_y)
