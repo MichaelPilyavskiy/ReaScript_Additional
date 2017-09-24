@@ -23,20 +23,22 @@
   23.09.2017  0.17  PatternBrowser
                     StepSequencer
                     StepSequencer: steps change, set default by doubleclick
-  24.09.2017  0.20  Mouse modifiers refinements
+  24.09.2017  0.21  Mouse modifiers refinements
                     StepSequencer: fix sequence HEX hash errors
                     StepSequencer: add MIDI, selected item comit mode
+                    Options/Browser: change fav path count
+                    Options/Pads: change key names
                     
   ]]
-  local vrs = 'v0.20alpha'
+  local vrs = 'v0.21beta'
   --NOT gfx NOT reaper
   local scr_title = 'RS5K manager'
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local mouse = {}
   local obj = {}
-  local conf = {}
-  pat = {}
+  conf = {}
+  local pat = {}
   local data = {}
   local action_export = {}
   local redraw = -1
@@ -46,7 +48,7 @@
                 mode = 0,
                 font = 'Calibri',
                 fontsz = 20,
-                fontsz2 = 14,
+                fontsz2 = 15,
                 a1 = 0.2, -- pat not sel
                 a2 = 0.45, -- pat sel
                 col = { grey =    {0.5, 0.5,  0.5 },
@@ -85,7 +87,9 @@
             -- Patterns
             default_steps = 16,
             default_value = 120,
-            commit_mode = 0 -- 0-commit to selected items
+            commit_mode = 0, -- 0-commit to selected items,
+            -- Options
+            options_tab = 0
             }
     for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
     return t
@@ -138,8 +142,13 @@
         y_sl = y + h/o.steps*o.val
         h_sl = h - h/o.steps
       end  
-      col(o.col, o.alpha_back or 0.2)
-      gfx.rect(x_sl,y_sl,w_sl,h_sl,1)
+      if not (o.state and o.alpha_back2) then 
+        col(o.col, o.alpha_back or 0.2)
+        gfx.rect(x_sl,y_sl,w_sl,h_sl,1)
+       else
+        col(o.col, o.alpha_back2 or 0.2)
+        gfx.rect(x_sl,y_sl,w_sl,h_sl,1)
+      end        
     
     -- step
       if o.is_step and o.val then
@@ -148,8 +157,8 @@
         local w_sl = w 
         local y_sl = y + h-h *val     
         local h_sl = h *val
-        col(o.col, 0.5)
-        gfx.rect(x_sl,y_sl,w_sl,h_sl,1)      
+        col(o.col, 0.7)
+        gfx.rect(x_sl,y_sl,w_sl-1,h_sl,1)      
       end
     
     -- tab
@@ -159,6 +168,8 @@
         local cur_tab = o.is_tab & 127
         gfx.line( x+cur_tab*w/tab_cnt,y,
                   x+w/tab_cnt*(1+cur_tab),y)
+        gfx.line( x+cur_tab*w/tab_cnt,y+h,
+                  x+w/tab_cnt*(1+cur_tab),y+h)                  
       end
       
     -- txt
@@ -167,7 +178,7 @@
         col('white', o.alpha_txt or 0.8)
         local f_sz = gui.fontsz
         gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
-        local y_shift = 0
+        local y_shift = -1
         for line in txt:gmatch('[^\r\n]+') do
           if gfx.measurestr(line:sub(2)) > w -2 and w > 20 then 
             repeat line = line:sub(2) until gfx.measurestr(line..'...')< w -2
@@ -275,17 +286,17 @@
         gfx.dest = 2
         gfx.setimgdim(2, -1, -1)  
         gfx.setimgdim(2, obj.grad_sz,obj.grad_sz)  
-        local r,g,b,a = 1,1,1,0.6
+        local r,g,b,a = 1,1,1,0.72
         gfx.x, gfx.y = 0,0
-        local c = 0.7
+        local c = 0.8
         local drdx = c*0.00001
         local drdy = c*0.00001
         local dgdx = c*0.00008
         local dgdy = c*0.0001    
         local dbdx = c*0.00008
         local dbdy = c*0.00001
-        local dadx = c*0.0008
-        local dady = c*0.001       
+        local dadx = c*0.0001
+        local dady = c*0.0001       
         gfx.gradrect(0,0, obj.grad_sz,obj.grad_sz, 
                         r,g,b,a, 
                         drdx, dgdx, dbdx, dadx, 
@@ -310,6 +321,8 @@
               GUI_DrawObj(obj[key]) 
             end  
           end  
+          gfx.a = 0.2
+          gfx.line(obj.tab_div,0,obj.tab_div,gfx.h )
         -- refresh blit list 1
           if blit_h then
             gfx.dest = 3
@@ -539,10 +552,12 @@
     obj.item_h4 = 40 -- steseq
     obj.item_w1 = 120 -- steseq name
     obj.scroll_w = 15
-    obj.it_alpha = 0.38 -- under tab
+    obj.it_alpha = 0.45 -- under tab
     obj.it_alpha2 = 0.28 -- navigation
+    obj.it_alpha3 = 0.1 -- option tabs
+    obj.it_alpha4 = 0.05 -- option items
     
-    obj.slider = { x = 0,
+    obj.tab = { x = 0,
                 y = 0,
                 h = obj.item_h,
                 col = 'white',
@@ -550,14 +565,14 @@
                 show = true,
                 alpha_back = 0.2,
                 func =  function()
-                          local _, val = MOUSE_Match(obj.slider)
+                          local _, val = MOUSE_Match(obj.tab)
                           conf.tab = math.floor(lim(val*3, 0,2.99) )
                           ExtState_Save() 
                           redraw = 1
-                          mouse.context_latch = 'slider'
-                          mouse.context_latch_val = conf.tab
+                          --mouse.context_latch = 'slider'
+                          --mouse.context_latch_val = conf.tab
                         end,
-                func_LD = function()
+                --[[func_LD = function()
                             if mouse.context_latch =='slider' 
                               and mouse.context_latch_val 
                               and mouse.is_moving then
@@ -566,7 +581,7 @@
                               ExtState_Save() 
                               redraw = 1
                             end
-                          end, 
+                          end]]
                 }
 
     obj.browser =      { x = 0,
@@ -577,7 +592,7 @@
                 alpha_back = 0.45,
                 ignore_mouse = true}
     obj.workarea = { 
-                y = obj.item_h+obj.item_h2+2,
+                y = 1,--obj.item_h+obj.item_h2+2,
                 h = gfx.h,
                 col = 'white',
                 --show = true,
@@ -607,48 +622,11 @@
                               redraw = 1
                             end
                           end}                                         
-    
-                      
-  end
-  ---------------------------------------------------
-  function OBJ_Update()
-    obj.tab_div = math.floor(gfx.w*conf.tab_div)
-    --
-    obj.slider.is_tab = conf.tab + (3<<7)
-    obj.slider.w = obj.tab_div
-    if conf.tab == 0 then 
-      obj.slider.txt = 'Samples & Pads'
-     elseif conf.tab == 1 then 
-      obj.slider.txt = 'Patterns & StepSeq'
-     elseif conf.tab == 2 then 
-      obj.slider.txt = 'Controls & Options'      
-    end
-    obj.slider.val = conf.tab
-    obj.slider.steps = 3
-    --
-    obj.browser.w = obj.tab_div
-    --
-    obj.workarea.x = obj.tab_div+1
-    obj.workarea.w = gfx.w - obj.tab_div - 2
-    --
-    obj.scroll.x =  obj.tab_div-obj.scroll_w
-    obj.scroll.val = slider_val
-    obj.scroll.h = gfx.h-obj.item_h-obj.item_h2-3
-    --
-    for key in pairs(obj) do if type(obj[key]) == 'table' and obj[key].clear then obj[key] = nil end end
-    if conf.tab == 0 then 
-      local cnt_it = OBJ_GenSampleBrowser()
-      if conf.keymode == 0 then OBJ_GenKeys() end
-      obj.scroll.steps = cnt_it
-     elseif conf.tab == 1 then 
-      local cnt_it = OBJ_GenPatternBrowser()
-      obj.scroll.steps = cnt_it   
-      local cnt_it2 = OBJ_GenStepSequencer() 
-      obj.scroll2 =  {clear = true,
+      obj.scroll2 =  {--clear = true,
                   x = gfx.w - obj.scroll_w,
-                  y = obj.item_h+2+obj.item_h2,
+                  y = 1,--obj.item_h+2+obj.item_h2,
                   w = obj.scroll_w,
-                  h = gfx.h-obj.item_h-obj.item_h2-3,
+                  h = gfx.h,---obj.item_h-obj.item_h2-3,
                   col = 'white',
                   show = true,
                   state = 0,
@@ -670,9 +648,153 @@
                               slider_val2 = lim(val, 0,1)
                               redraw = 1
                             end
-                          end}   
+                          end}    
+                      
+  end
+  ---------------------------------------------------
+  function OBJ_Update()
+    obj.tab_div = math.floor(gfx.w*conf.tab_div)
+    --
+    obj.tab.is_tab = conf.tab + (3<<7)
+    obj.tab.w = obj.tab_div
+    if conf.tab == 0 then 
+      obj.tab.txt = 'Samples & Pads'
+     elseif conf.tab == 1 then 
+      obj.tab.txt = 'Patterns & StepSeq'
+     elseif conf.tab == 2 then 
+      obj.tab.txt = 'Controls & Options'      
+    end
+    obj.tab.val = conf.tab
+    obj.tab.steps = 3
+    --
+    obj.browser.w = obj.tab_div
+    --
+    obj.workarea.x = obj.tab_div+1
+    obj.workarea.w = gfx.w - obj.tab_div - 2
+    --
+    obj.scroll.x =  obj.tab_div-obj.scroll_w
+    obj.scroll.val = slider_val
+    obj.scroll.h = gfx.h-obj.item_h-obj.item_h2-3
+    obj.scroll.show = true
+    obj.scroll2.show = false
+    --
+    for key in pairs(obj) do if type(obj[key]) == 'table' and obj[key].clear then obj[key] = nil end end
+    ---------------------------------------------macro windows
+    if conf.tab == 0 then 
+      local cnt_it = OBJ_GenSampleBrowser()
+      if conf.keymode == 0 then OBJ_GenKeys() end
+      obj.scroll.steps = cnt_it
+      -----------------------
+     elseif conf.tab == 1 then 
+      local cnt_it = OBJ_GenPatternBrowser()
+      obj.scroll.steps = cnt_it   
+      local cnt_it2 = OBJ_GenStepSequencer()
+      obj.scroll2.show = true 
+      -----------------------
+     elseif conf.tab == 2 then 
+      obj.scroll.show = false
+      OBJ_GenOptionsList() 
+      if conf.options_tab == 0 then OBJ_GenOptionsList_Browser() 
+       elseif conf.options_tab == 1 then OBJ_GenOptionsList_Pads() end
+      
+      -----------------------
     end
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
+  end
+  ----------------------------------------------------------------------- 
+  function OBJ_GenOptionsList_Pads()
+    obj.opt_pad_keynames = { clear = true,
+                x = obj.tab_div+2,
+                y = obj.browser.y,
+                w = gfx.w - obj.tab_div-4,
+                h = obj.item_h2,
+                col = 'white',
+                state = conf.options_tab == 0,
+                txt= 'Key names: '..({GetNoteStr(0, conf.key_names)})[2],
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha4,
+                func =  function() 
+                          Menu({  {str = ({GetNoteStr(1, 8)})[2],
+                                    func = function() conf.key_names = 8 ExtState_Save() redraw = 1 end ,
+                                    state = conf.key_names == 8},
+                                  {str = ({GetNoteStr(1, 7)})[2],
+                                    func = function() conf.key_names = 7 ExtState_Save() redraw = 1 end ,
+                                    state = conf.key_names == 7}
+                                })
+                        end}     
+  end
+  ----------------------------------------------------------------------- 
+  function OBJ_GenOptionsList_Browser()
+    obj.opt_sample_favpathcount = { clear = true,
+                x = obj.tab_div+2,
+                y = obj.browser.y,
+                w = gfx.w - obj.tab_div-4,
+                h = obj.item_h2,
+                col = 'white',
+                state = conf.options_tab == 0,
+                txt= 'Favourite paths: '..conf.fav_path_cnt,
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha4,
+                func =  function() 
+                          ret = GetInput( 'Set favourite paths count', conf.fav_path_cnt,true)
+                          if ret then 
+                            conf.fav_path_cnt = ret 
+                            ExtState_Save()
+                            redraw = 1 
+                          end                          
+                        end}     
+  end
+  ----------------------------------------------------------------------- 
+  function GetInput( captions_csv, retvals_csv,floor)
+    ret, str =  GetUserInputs( scr_title, 1, captions_csv, retvals_csv )
+    if not ret then return end
+    if not tonumber(str) then return end
+    local num = tonumber(str)
+    if floor then num = math.floor(num) end
+    return num
+  end
+  ----------------------------------------------------------------------- 
+  function OBJ_GenOptionsList() 
+    obj.opt_sample = { clear = true,
+                x = obj.browser.x+1,
+                y = obj.browser.y,
+                w = obj.tab_div-2,
+                h = obj.item_h2,
+                col = 'white',
+                state = conf.options_tab == 0,
+                txt= 'Browser',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha3,
+                alpha_back2 = obj.it_alpha2,
+                func =  function() 
+                          conf.options_tab = 0 
+                          ExtState_Save()
+                          redraw = 1
+                        end}  
+    obj.opt_pads = { clear = true,
+                x = obj.browser.x+1,
+                y = obj.browser.y+(obj.item_h2+1),
+                w = obj.tab_div-2,
+                h = obj.item_h2,
+                col = 'white',
+                state = conf.options_tab == 1,
+                txt= 'Pads',
+                show = true,
+                is_but = true,
+                fontsz = gui.fontsz2,
+                alpha_back = obj.it_alpha3,
+                alpha_back2 = obj.it_alpha2,
+                func =  function() 
+                          conf.options_tab = 1
+                          ExtState_Save() 
+                          redraw = 1
+                        end}                           
   end
   ----------------------------------------------------------------------- 
   function CheckPatCond(note)
@@ -705,7 +827,7 @@
                   x = 0,
                   y = (cnt-1)*obj.item_h4,
                   w =  obj.item_w1,
-                  h = obj.item_h4,
+                  h = obj.item_h4-1,
                   col = col,
                   state = 1,
                   txt= txt,
@@ -727,7 +849,7 @@
                   x = obj.item_w1 + 1,
                   y = (cnt-1)*obj.item_h4,
                   w = obj.item_h4,
-                  h = obj.item_h4,
+                  h = obj.item_h4-1,
                   col = col,
                   state = 0,
                   txt= steps,
@@ -774,7 +896,7 @@
                   x = obj.item_w1 + obj.item_h4 + 2 + (step-1)*step_w,
                   y = (cnt-1)*obj.item_h4,
                   w = step_w,
-                  h = obj.item_h4,
+                  h = obj.item_h4-1,
                   col = col,
                   state = 1,
                   txt= '',
@@ -783,7 +905,7 @@
                   show = true,
                   is_step = true,
                   fontsz = gui.fontsz2,
-                  alpha_back = 0.22,
+                  alpha_back = 0.3,
                   val = val,
                   --a_line = 0,
                   mouse_offs_x = obj.workarea.x,
@@ -1052,57 +1174,60 @@
   -----------------------------------------------------------------------    
     function GetNoteStr(val, mode) 
       local oct_shift = conf.oct_shift-7
-      if conf.key_names == 0 or (mode and mode==0) then
+      local int_mode
+      if mode then int_mode = mode else int_mode = conf.key_names end
+      if int_mode == 0 then
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
         if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end
-       elseif conf.key_names == 1 then
+       elseif int_mode == 1 then
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B',}
         if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
-       elseif conf.key_names == 2 then
+       elseif int_mode == 2 then
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si',}
         if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end      
-       elseif conf.key_names == 3 then
+       elseif int_mode == 3 then
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'Do', 'Re♭', 'Re', 'Mi♭', 'Mi', 'Fa', 'Sol♭', 'Sol', 'La♭', 'La', 'Si♭', 'Si',}
         if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end       
-       elseif conf.key_names == 4 -- midi pitch
+       elseif int_mode == 4 -- midi pitch
         then return val
-       elseif 
-        conf.key_names == 5 -- freq
+       elseif int_mode == 5 -- freq
         then return math.floor(440 * 2 ^ ( (val - 69) / 12))..'Hz'
-       elseif 
-        conf.key_names == 6 -- empty
+       elseif int_mode == 6 -- empty
         then return ''
-       elseif 
-        conf.key_names == 7 then -- ru
+       elseif int_mode == 7 then -- ru
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'До', 'До#', 'Ре', 'Ре#', 'Ми', 'Фа', 'Фа#', 'Соль', 'Соль#', 'Ля', 'Ля#', 'Си'}
-        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift end  
-       elseif conf.key_names == 8 then
+        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift..'\n'..val,
+                                                          'keys (RU) + octave + MIDI note' end  
+       elseif int_mode == 8 then
         if not val then return end
         local val = math.floor(val)
         local oct = math.floor(val / 12)
         local note = math.fmod(val,  12)
         local key_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',}
-        if note and oct and key_names[note+1] then return key_names[note+1]..oct+oct_shift..'\n'..val end              
+        if note and oct and key_names[note+1] then 
+          return key_names[note+1]..oct+oct_shift..'\n'..val,
+                  'keys + octave + MIDI note'
+        end              
       end
     end
     ---------------------------------------------------
@@ -1130,7 +1255,7 @@
     end
     ---------------------------------------------------
     function OBJ_GenKeys()
-      local opt_h = obj.item_h +  1 + obj.item_h2 + 1
+      local opt_h = 0--obj.item_h +  1 + obj.item_h2 + 1
       local key_w = math.ceil(obj.workarea.w/7)
       local key_h = math.ceil(0.5*(gfx.h - opt_h))
       local shifts  = {{0,1},
@@ -1179,7 +1304,8 @@
     ---------------------------------------------------
     function GetParentFolder(dir) return dir:match('(.*)[%\\/]') end
     ---------------------------------------------------
-    function Menu_FormBrowser()                   
+    function Menu_FormBrowser()    
+      for i = 1, conf.fav_path_cnt  do if not conf['smpl_browser_fav_path'..i] then conf['smpl_browser_fav_path'..i] = '' end end
       local browser_t =
                                     {
                                       {str = 'Browse for file/path',
@@ -1339,52 +1465,21 @@
           if mouse.RMB_state and  (mouse.context == key or mouse.context_latch == key) then if obj[key].func_RD then obj[key].func_RD() end end
         end
       end
-    --[[ butts    
-    for key in pairs(obj) do
-      if not key:match('knob') and type(obj[key]) == 'table' then
-        if obj[key].is_but then  
-          if MOUSE_Click(obj[key]) then 
-            if obj[key].func then  obj[key].func() end 
-           elseif MOUSE_Click(obj[key], 'R') then 
-            if obj[key].func2 then  obj[key].func2() end 
-          end 
-        end
-        if obj[key].is_slider then  
-          if MOUSE_Click(obj[key]) then 
-            if obj[key].allow_click_to_set then
-              local v = (mouse.mx-obj[key].x) / obj[key].w
-              obj[key].val = v              
-              obj[key].func(v)
-            end            
-            mouse.context_latch = obj[key].context
-            mouse.context_latch_val = obj[key].val
-           elseif MOUSE_Match(obj[key]) and mouse.trig_LMB and mouse.trig_LMB == 1 then
-            obj[key].func()
-          end
-        end
-        if mouse.is_moving 
-          and mouse.LMB_state 
-          and mouse.context_latch 
-          and mouse.context_latch == obj[key].context
-          and mouse.context_latch_val 
-          and obj[key].axis 
-          and obj[key].mouse_scale then 
-          obj[key].val = mouse.context_latch_val + mouse['d'..obj[key].axis]/obj[key].mouse_scale
-          obj[key].func(obj[key].val)
-        end
-      end
-    end]]
     
     -- scroll
       if mouse.mx < obj.browser.x + obj.browser.w  and mouse.wheel_trig and mouse.wheel_trig ~= 0 then
-        slider_val = lim(slider_val - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
-        redraw = 1
+        if blit_h > obj.browser.h then 
+          slider_val = lim(slider_val - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
+          redraw = 1
+        end
       end
 
     -- scroll stepseq
       if mouse.mx > obj.workarea.x  and mouse.wheel_trig and mouse.wheel_trig ~= 0 then
-        slider_val2 = lim(slider_val2 - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
-        redraw = 1
+        if blit_h2 > gfx.h then
+          slider_val2 = lim(slider_val2 - mouse.wheel_trig/conf.mouse_wheel_res,0,1)
+          redraw = 1
+        end
       end
           
     -- mouse release    
