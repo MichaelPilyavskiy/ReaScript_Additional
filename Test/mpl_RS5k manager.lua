@@ -23,18 +23,21 @@
   23.09.2017  0.17  PatternBrowser
                     StepSequencer
                     StepSequencer: steps change, set default by doubleclick
+  24.09.2017  0.20  Mouse modifiers refinements
+                    StepSequencer: fix sequence HEX hash errors
+                    StepSequencer: add MIDI, selected item comit mode
                     
   ]]
-  local vrs = 'v0.17alpha'
+  local vrs = 'v0.20alpha'
   --NOT gfx NOT reaper
   local scr_title = 'RS5K manager'
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local mouse = {}
   local obj = {}
-  conf = {}
+  local conf = {}
   pat = {}
-  data = {}
+  local data = {}
   local action_export = {}
   local redraw = -1
   local blit_h,slider_val,blit_h2,slider_val2 = 0,0,0,0
@@ -68,7 +71,7 @@
             wind_h =  200,
             dock =    0,
             -- GUI
-            tab = 0,
+            tab = 0,  -- 0-sample browser
             tab_div = 0.3,
             -- GUI control
             mouse_wheel_res = 960,
@@ -76,11 +79,13 @@
             cur_smpl_browser_dir = GetResourcePath():gsub('\\','/'),
             fav_path_cnt = 4,
             -- Pads
-            keymode = 0,
+            keymode = 0,  -- 0-keys
             oct_shift = 5,
-            key_names = 8,
+            key_names = 8, --8 return MIDInotes and keynames
             -- Patterns
-            default_steps = 16
+            default_steps = 16,
+            default_value = 120,
+            commit_mode = 0 -- 0-commit to selected items
             }
     for i = 1, t.fav_path_cnt do t['smpl_browser_fav_path'..i] = '' end
     return t
@@ -122,19 +127,19 @@
               x,y,w,h, 0,0)
     
     -- fill back
-    local x_sl = x      
-    local w_sl = w 
-    local y_sl = y      
-    local h_sl = h 
-    if o.is_slider and o.steps and (not o.axis or o.axis == 'x') then 
-      x_sl = x + w/o.steps*o.val
-      w_sl = w/o.steps
-     elseif o.is_slider  and o.steps and o.axis == 'y' then 
-      y_sl = y + h/o.steps*o.val
-      h_sl = h - h/o.steps
-    end  
-    col(o.col, o.alpha_back or 0.2)
-    gfx.rect(x_sl,y_sl,w_sl,h_sl,1)
+      local x_sl = x      
+      local w_sl = w 
+      local y_sl = y      
+      local h_sl = h 
+      if o.is_slider and o.steps and (not o.axis or o.axis == 'x') then 
+        x_sl = x + w/o.steps*o.val
+        w_sl = w/o.steps
+       elseif o.is_slider  and o.steps and o.axis == 'y' then 
+        y_sl = y + h/o.steps*o.val
+        h_sl = h - h/o.steps
+      end  
+      col(o.col, o.alpha_back or 0.2)
+      gfx.rect(x_sl,y_sl,w_sl,h_sl,1)
     
     -- step
       if o.is_step and o.val then
@@ -143,56 +148,67 @@
         local w_sl = w 
         local y_sl = y + h-h *val     
         local h_sl = h *val
-        col(o.col, 0.6)
+        col(o.col, 0.5)
         gfx.rect(x_sl,y_sl,w_sl,h_sl,1)      
+      end
+    
+    -- tab
+      if o.is_tab then
+        col(o.col, 0.6)
+        local tab_cnt = o.is_tab >> 7
+        local cur_tab = o.is_tab & 127
+        gfx.line( x+cur_tab*w/tab_cnt,y,
+                  x+w/tab_cnt*(1+cur_tab),y)
       end
       
     -- txt
-    if o.txt then 
-      local txt = tostring(o.txt)
-      col('white', o.alpha_txt or 0.8)
-      local f_sz = gui.fontsz
-      gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
-      local y_shift = 0
-      for line in txt:gmatch('[^\r\n]+') do
-        if gfx.measurestr(line:sub(2)) > w -2 and w > 20 then 
-          repeat line = line:sub(2) until gfx.measurestr(line..'...')< w -2
-          line = '...'..line
+      if o.txt then 
+        local txt = tostring(o.txt)
+        col('white', o.alpha_txt or 0.8)
+        local f_sz = gui.fontsz
+        gfx.setfont(1, gui.font,o.fontsz or gui.fontsz )
+        local y_shift = 0
+        for line in txt:gmatch('[^\r\n]+') do
+          if gfx.measurestr(line:sub(2)) > w -2 and w > 20 then 
+            repeat line = line:sub(2) until gfx.measurestr(line..'...')< w -2
+            line = '...'..line
+          end
+          if o.txt2 then line = o.txt2..' '..line end
+          gfx.x = x+ (w-gfx.measurestr(line))/2
+          gfx.y = y+ (h-gfx.texth)/2 + y_shift 
+          if o.aligh_txt then
+            if o.aligh_txt&1 then gfx.x = x + 1 end -- align left
+            if o.aligh_txt>>2&1 then gfx.y = y + y_shift end -- align top
+          end
+          if o.bot_al_txt then 
+            gfx.y = y+ h-gfx.texth-3 +y_shift
+          end
+          gfx.drawstr(line)
+          y_shift = y_shift + gfx.texth
         end
-        if o.txt2 then line = o.txt2..' '..line end
-        gfx.x = x+ (w-gfx.measurestr(line))/2
-        gfx.y = y+ (h-gfx.texth)/2 + y_shift 
-        if o.aligh_txt then
-          if o.aligh_txt&1 then gfx.x = x + 1 end -- align left
-          if o.aligh_txt>>2&1 then gfx.y = y + y_shift end -- align top
-        end
-        if o.bot_al_txt then 
-          gfx.y = y+ h-gfx.texth-3 +y_shift
-        end
-        gfx.drawstr(line)
-        y_shift = y_shift + gfx.texth
       end
-    end
     
+    -- line
+      if o.a_line then  -- low frame
+        col(o.col, o.a_frame or 0.2)
+        gfx.x,gfx.y = x+1,y+h
+        gfx.lineto(x+w,y+h)
+      end
+      
     -- frame
-    if o.a_line then  -- low frame
-      col(o.col, o.a_frame or 0.2)
-      gfx.x,gfx.y = x+1,y+h
-      gfx.lineto(x+w,y+h)
-    end
-    -- frame
-    if o.a_frame then  -- low frame
-      col(o.col, o.a_frame or 0.2)
-      gfx.rect(x,y,w,h,0)
-      gfx.x,gfx.y = x,y
-      gfx.lineto(x,y+h)
-      gfx.x,gfx.y = x+1,y+h
-      --gfx.lineto(x+w,y+h)
-      gfx.x,gfx.y = x+w,y+h-1
-      --gfx.lineto(x+w,y)
-      gfx.x,gfx.y = x+w-1,y
-      gfx.lineto(x+1,y)
-    end    
+      if o.a_frame then  -- low frame
+        col(o.col, o.a_frame or 0.2)
+        gfx.rect(x,y,w,h,0)
+        gfx.x,gfx.y = x,y
+        gfx.lineto(x,y+h)
+        gfx.x,gfx.y = x+1,y+h
+        --gfx.lineto(x+w,y+h)
+        gfx.x,gfx.y = x+w,y+h-1
+        --gfx.lineto(x+w,y)
+        gfx.x,gfx.y = x+w-1,y
+        gfx.lineto(x+1,y)
+      end    
+      
     return true
   end
   ---------------------------------------------------
@@ -232,6 +248,19 @@
     end
   end
   ---------------------------------------------------
+  function GUI_SeqLines()
+    gfx.a = 0.2
+    local step_w = (obj.workarea.w - obj.item_w1 - obj.item_h4- 3-obj.scroll_w) / 16
+    for i = 1, 16 do
+      if i%4 == 1 then
+        gfx.line(obj.item_w1 + obj.item_h4 + 2 + (i-1)*step_w, 
+                0, 
+                obj.item_w1 + obj.item_h4 + 2 + (i-1)*step_w, 
+                blit_h2)
+      end
+    end
+  end
+  ---------------------------------------------------
   local function GUI_draw()
     gfx.mode = 0
     -- redraw: -1 init, 1 maj changes, 2 minor changes
@@ -246,7 +275,7 @@
         gfx.dest = 2
         gfx.setimgdim(2, -1, -1)  
         gfx.setimgdim(2, obj.grad_sz,obj.grad_sz)  
-        local r,g,b,a = 1,1,1,0.55
+        local r,g,b,a = 1,1,1,0.6
         gfx.x, gfx.y = 0,0
         local c = 0.7
         local drdx = c*0.00001
@@ -301,7 +330,8 @@
               if type(obj[key]) == 'table' and obj[key].show and obj[key].blit and obj[key].blit== 4 then 
                 local ret = GUI_DrawObj(obj[key])
               end  
-            end    
+            end 
+            if conf.tab == 1 then GUI_SeqLines()   end
           end          
       end
       
@@ -424,7 +454,9 @@
           if not key:match('NOTE[%d]+') then 
             str = str..'\n'..ind..key..' '..pat_t[key]
            else
-            str = str..'\n'..ind..key..' '..pat_t[key].STEPS
+            local steps = conf.default_steps
+            if pat_t[key] and pat_t[key].STEPS then steps = pat_t[key].STEPS end
+            str = str..'\n'..ind..key..' '..steps
             if pat_t[key].SEQHASH then str = str..' '..pat_t[key].SEQHASH end
           end
         end
@@ -433,8 +465,54 @@
         str = str..'\n'..k..' '..pat[k]
       end
     end  
-    msg('\nSAVE\n'..str)
+    --msg('\nSAVE\n'..str)
     SetProjExtState( 0, conf.ES_key, 'PAT', str )
+    CommitPattern()
+  end
+  ---------------------------------------------------
+  function CommitPattern()
+    if conf.commit_mode == 0 then
+      if pat[pat.SEL] then
+        for i = 1, CountSelectedMediaItems(0) do
+          local it = GetSelectedMediaItem(0,i-1)
+          local tk = GetActiveTake(it)
+          if tk and TakeIsMIDI(tk) then CommitPatternSub(it, tk, pat[pat.SEL]) end
+        end
+      end
+    end
+  end
+  ---------------------------------------------------
+  function CommitPatternSub(it, tk, pat_t)
+    -- update name
+    GetSetMediaItemTakeInfo_String( tk, 'P_NAME', pat_t.NAME,  1 )
+    -- clear MIDI data
+    for i = ({MIDI_CountEvts( tk )})[2], 1, -1 do MIDI_DeleteNote( tk, i-1 ) end
+    -- add notes
+      for key in spairs(pat_t) do
+        if key:match('NOTE[%d]+') then
+          local t = pat_t[key]
+          local note = tonumber(key:match('[%d]+'))
+          local MeasPPQ = 38400
+          local step_len = math.ceil(MeasPPQ/t.STEPS)
+          for step = 1, t.STEPS do
+            if t.seq[step] and t.seq[step] > 0 then
+              MIDI_InsertNote( 
+               tk, 
+               false, -- selected
+               false, -- muted
+               step_len * (step-1), -- start ppq
+               step_len * step,  -- end ppq
+               0, -- channel
+               note, -- pitch
+               t.seq[step], -- velocity
+               true) -- no sort]]
+            end
+          end
+        end
+      end
+    -- update GUI
+    reaper.MIDI_Sort( tk )
+    UpdateItemInProject( it )
   end
   ---------------------------------------------------
   function CopyTable(orig)--http://lua-users.org/wiki/CopyTable
@@ -461,8 +539,8 @@
     obj.item_h4 = 40 -- steseq
     obj.item_w1 = 120 -- steseq name
     obj.scroll_w = 15
-    obj.it_alpha = 0.35 -- under tab
-    obj.it_alpha2 = 0.24 -- navigation
+    obj.it_alpha = 0.38 -- under tab
+    obj.it_alpha2 = 0.28 -- navigation
     
     obj.slider = { x = 0,
                 y = 0,
@@ -470,24 +548,33 @@
                 col = 'white',
                 state = 0,
                 show = true,
-                is_slider = true,
-                mouse_scale = 100,
-                axis = 'x',
-                allow_click_to_set = true,
-                alpha_back = 0.4,
-                func =  function(val) 
-                          local v = lim(val, 0,1) 
-                          conf.tab = math.max(0,math.ceil(v*3)-1) 
+                alpha_back = 0.2,
+                func =  function()
+                          local _, val = MOUSE_Match(obj.slider)
+                          conf.tab = math.floor(lim(val*3, 0,2.99) )
                           ExtState_Save() 
-                          redraw = 1 
-                        end}
+                          redraw = 1
+                          mouse.context_latch = 'slider'
+                          mouse.context_latch_val = conf.tab
+                        end,
+                func_LD = function()
+                            if mouse.context_latch =='slider' 
+                              and mouse.context_latch_val 
+                              and mouse.is_moving then
+                              local val = mouse.context_latch_val + mouse.dx/20
+                              conf.tab = math.floor(lim(val, 0,2.99) )
+                              ExtState_Save() 
+                              redraw = 1
+                            end
+                          end, 
+                }
 
     obj.browser =      { x = 0,
                 y = obj.item_h+1,
                 h = gfx.h-obj.item_h,
                 col = 'white',
                 state = 0,
-                alpha_back = 0.4,
+                alpha_back = 0.45,
                 ignore_mouse = true}
     obj.workarea = { 
                 y = obj.item_h+obj.item_h2+2,
@@ -495,7 +582,6 @@
                 col = 'white',
                 --show = true,
                 state = 0,
-                alpha_back = 0.4,
                 ignore_mouse = true}                
     obj.scroll =  {
                 y = obj.item_h+2+obj.item_h2,
@@ -509,9 +595,18 @@
                 axis = 'y',
                 is_slider = true,
                 func =  function(val) 
-                          slider_val = lim(val, 0,1) 
-                          redraw = 1
-                        end}                     
+                          mouse.context_latch = 'scroll'
+                          mouse.context_latch_val = slider_val
+                        end,
+                func_LD = function()
+                            if mouse.context_latch =='scroll' 
+                              and mouse.context_latch_val 
+                              and mouse.is_moving then
+                              local val = mouse.context_latch_val + mouse.dy/20
+                              slider_val = lim(val, 0,1)
+                              redraw = 1
+                            end
+                          end}                                         
     
                       
   end
@@ -519,6 +614,7 @@
   function OBJ_Update()
     obj.tab_div = math.floor(gfx.w*conf.tab_div)
     --
+    obj.slider.is_tab = conf.tab + (3<<7)
     obj.slider.w = obj.tab_div
     if conf.tab == 0 then 
       obj.slider.txt = 'Samples & Pads'
@@ -562,16 +658,26 @@
                   val = slider_val2 ,
                   steps = cnt_it2,
                   is_slider = true,
-                  func =  function(val) 
-                            slider_val2 = lim(val, 0,1) 
-                            redraw = 1
-                          end}  
+                func =  function(val) 
+                          mouse.context_latch = 'scroll2'
+                          mouse.context_latch_val = slider_val2
+                        end,
+                func_LD = function()
+                            if mouse.context_latch =='scroll2' 
+                              and mouse.context_latch_val 
+                              and mouse.is_moving then
+                              local val = mouse.context_latch_val + mouse.dy/20
+                              slider_val2 = lim(val, 0,1)
+                              redraw = 1
+                            end
+                          end}   
     end
     for key in pairs(obj) do if type(obj[key]) == 'table' then obj[key].context = key end end    
   end
   ----------------------------------------------------------------------- 
   function CheckPatCond(note)
     if data[note] then return true end
+    if not pat[pat.SEL] then return  end
     for key in pairs(pat[pat.SEL]) do
       if key == ('NOTE'..note) then return true end
     end
@@ -608,7 +714,7 @@
                   show = true,
                   is_but = true,
                   fontsz = gui.fontsz2,
-                  alpha_back = 0.4,
+                  alpha_back = 0.49,
                   --a_line = 0,
                   mouse_offs_x = obj.workarea.x,
                   mouse_offs_y = obj.blit_y_src2-(obj.item_h+obj.item_h2 +2),
@@ -623,75 +729,96 @@
                   w = obj.item_h4,
                   h = obj.item_h4,
                   col = col,
-                  state = 1,
+                  state = 0,
                   txt= steps,
                   --aligh_txt = 1,
                   blit = 4,
                   show = true,
-                  is_slider = true,
-                  mouse_scale = 15,
-                  axis = 'y',
-                  allow_click_to_set = false,
                   fontsz = gui.fontsz2,
-                  alpha_back = 0.4,
-                  val = steps,
+                  alpha_back = 0.49,
                   --a_line = 0,
                   mouse_offs_x = obj.workarea.x,
                   mouse_offs_y = obj.blit_y_src2-obj.workarea.y,
-                  func =  function(val) 
-                            if pat[pat.SEL] then
-                              if not val then 
-                                if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
-                                pat[pat.SEL]['NOTE'..i].STEPS = conf.default_steps
-                               else
-                                local v = math.floor(lim(val, 1,32) )
-                                if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
-                                pat[pat.SEL]['NOTE'..i].STEPS = v
+                  func =  function()
+                            if not pat[pat.SEL] then return end
+                            mouse.context_latch = 'stseq_steps'..i
+                            mouse.context_latch_val = steps
+                          end,
+                  func_LD = function()
+                              if mouse.context_latch =='stseq_steps'..i
+                                and mouse.context_latch_val 
+                                and mouse.is_moving 
+                                and pat[pat.SEL] then
+                                  local val = mouse.context_latch_val - mouse.dy/20
+                                  local val = math.floor(lim(val, 1,32) )
+                                  if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
+                                  pat[pat.SEL]['NOTE'..i].STEPS = val
+                                  ExtState_Save_Patterns()
+                                  redraw = 1 
                               end
-                              ExtState_Save_Patterns()
-                              redraw = 1 
-                            end
-                          end} 
+                          end,
+                  func_DC = function()
+                              if pat[pat.SEL] then
+                                  if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
+                                  pat[pat.SEL]['NOTE'..i].STEPS = conf.default_steps
+                                  ExtState_Save_Patterns()
+                                  redraw = 1 
+                              end
+                          end}                          
         -- steps
         local step_w = (obj.workarea.w - obj.item_w1 - obj.item_h4- 3-obj.scroll_w) / steps
         for step = 1, steps do
           local val = 0
-          if pat[pat.SEL]['NOTE'..i] and pat[pat.SEL]['NOTE'..i].seq[step] then val = pat[pat.SEL]['NOTE'..i].seq[step] end
+          if pat[pat.SEL] and pat[pat.SEL]['NOTE'..i] and pat[pat.SEL]['NOTE'..i].seq and pat[pat.SEL]['NOTE'..i].seq[step] then val = pat[pat.SEL]['NOTE'..i].seq[step] end
           obj['stseq_stepseq'..i..'_'..step] = {  clear = true,
                   x = obj.item_w1 + obj.item_h4 + 2 + (step-1)*step_w,
                   y = (cnt-1)*obj.item_h4,
                   w = step_w,
                   h = obj.item_h4,
-                  col = 'white',
+                  col = col,
                   state = 1,
                   txt= '',
                   --aligh_txt = 1,
                   blit = 4,
                   show = true,
-                  is_slider = true,
                   is_step = true,
-                  mouse_scale = -1,
-                  axis = 'y',
-                  allow_click_to_set = true,
                   fontsz = gui.fontsz2,
-                  alpha_back = 0.4,
+                  alpha_back = 0.22,
                   val = val,
                   --a_line = 0,
                   mouse_offs_x = obj.workarea.x,
                   mouse_offs_y = obj.blit_y_src2-obj.workarea.y,
-                  func =  function(val) 
+                  func =  function() 
+                            mouse.context_latch = 'stseq_stepseq'..i..'_'..step
                             if not pat[pat.SEL] then return end
-                            local v = math.floor(lim(val, 1,127) )
                             if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
                             if not pat[pat.SEL]['NOTE'..i].STEPS then pat[pat.SEL]['NOTE'..i].STEPS = conf.default_steps end
                             if not pat[pat.SEL]['NOTE'..i].seq then pat[pat.SEL]['NOTE'..i].seq = {} end
-                            pat[pat.SEL]['NOTE'..i].seq[step] = 120--v
+                            if not pat[pat.SEL]['NOTE'..i].seq[step] then pat[pat.SEL]['NOTE'..i].seq[step] = 0 end
+                            if pat[pat.SEL]['NOTE'..i].seq[step] > 0 then 
+                              pat[pat.SEL]['NOTE'..i].seq[step] = 0
+                              mouse.context_latch_val = 0
+                             else
+                              mouse.context_latch_val = conf.default_value
+                              pat[pat.SEL]['NOTE'..i].seq[step] = conf.default_value
+                            end
                             pat[pat.SEL]['NOTE'..i].SEQHASH = FormSeqHash(steps, pat[pat.SEL]['NOTE'..i].seq)
                             ExtState_Save_Patterns()
                             redraw = 1 
                           end ,
-                  func2 =  function()
-                              msg(1) 
+                  func_LD =  function() 
+                                if not pat[pat.SEL] or not mouse.is_moving  then return end
+                                if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
+                                if not pat[pat.SEL]['NOTE'..i].STEPS then pat[pat.SEL]['NOTE'..i].STEPS = conf.default_steps end
+                                if not pat[pat.SEL]['NOTE'..i].seq then pat[pat.SEL]['NOTE'..i].seq = {} end
+                                if pat[pat.SEL]['NOTE'..i].seq[step] and mouse.context_latch_val then 
+                                  pat[pat.SEL]['NOTE'..i].seq[step] = mouse.context_latch_val
+                                end
+                                pat[pat.SEL]['NOTE'..i].SEQHASH = FormSeqHash(steps, pat[pat.SEL]['NOTE'..i].seq)
+                                ExtState_Save_Patterns()
+                                redraw = 1 
+                          end,
+                  func_RD =  function() 
                             if not pat[pat.SEL] then return end
                             if not pat[pat.SEL]['NOTE'..i] then pat[pat.SEL]['NOTE'..i] = {} end
                             if not pat[pat.SEL]['NOTE'..i].STEPS then pat[pat.SEL]['NOTE'..i].STEPS = conf.default_steps end
@@ -700,7 +827,7 @@
                             pat[pat.SEL]['NOTE'..i].SEQHASH = FormSeqHash(steps, pat[pat.SEL]['NOTE'..i].seq)
                             ExtState_Save_Patterns()
                             redraw = 1 
-                          end}                                       
+                          end                           }                                      
         end
       end    
     end
@@ -712,7 +839,7 @@
   function FormSeqHash(step_cnt, t)
     local out_val = ''
     for i = 1, step_cnt do
-      local sval if not t[i] then sval = 0 else sval = t[i] end
+      local sval if not t[i] then sval = 0 else sval = math.min(math.max(0,t[i]),127)  end
       out_val = out_val..''..string.format("%02X", sval)
     end
     return out_val
@@ -720,7 +847,11 @@
   ---------------------------------------------------
   function GetSeqHash(hash) 
     local t = {}
-    for hex in hash:gmatch('[%a%d][%a%d]') do t[#t+1] = tonumber(hex, 16) end
+    if not hash then return t end
+    for hex in hash:gmatch('[%a%d][%a%d]') do 
+      local val = tonumber(hex, 16)
+      t[#t+1] = math.min(math.max(0,val),127) 
+    end
     return t
   end
 -----------------------------------------------------------------------   
@@ -1034,7 +1165,7 @@
                     linked_note = note,
                     show = true,
                     is_but = true,
-                    alpha_back = 0.2+ 0.2*shifts[i][2],
+                    alpha_back = 0.25+ 0.3*shifts[i][2],
                     a_frame = 0.1,
                     aligh_txt = 5,
                     fontsz = gui.fontsz2,
@@ -1157,7 +1288,10 @@
               and mouse.mx < b.x+b.w + b.mouse_offs_x
               and mouse.my > b.y - b.mouse_offs_y
               and mouse.my < b.y+b.h - b.mouse_offs_y
-      if state and not b.ignore_mouse then mouse.context = b.context return true end
+      if state and not b.ignore_mouse then mouse.context = b.context 
+        return true,  
+                (mouse.mx - b.x- b.mouse_offs_x) / b.w
+      end
     end  
   end
  ------------- -------------------------------------- 
@@ -1181,19 +1315,31 @@
     mouse.Ctrl_state = gfx.mouse_cap&4 == 4 
     mouse.Alt_state = gfx.mouse_cap&17 == 17 -- alt + LB
     mouse.wheel = gfx.mouse_wheel
+    
+    --if mouse.LMB_state and not mouse.last_LMB_state then mouse.LMB_trig = true end     
     if mouse.last_mx and mouse.last_my and (mouse.last_mx ~= mouse.mx or mouse.last_my ~= mouse.my) then mouse.is_moving = true else mouse.is_moving = false end
     if mouse.last_wheel then mouse.wheel_trig = (mouse.wheel - mouse.last_wheel) end 
+    if not mouse.LMB_state_TS then mouse.LMB_state_TS = clock end
     if mouse.LMB_state and not mouse.last_LMB_state then  
       mouse.last_mx_onclick = mouse.mx     
       mouse.last_my_onclick = mouse.my 
-      if mouse.LMB_state_TS then if clock - mouse.LMB_state_TS > 0.2 then mouse.trig_LMB = 0 else mouse.trig_LMB = 1 end end
+      if mouse.LMB_state_TS then if clock - mouse.LMB_state_TS > 0.2 then mouse.LMB_trig = 0 else mouse.LMB_trig = 1 end end
       mouse.LMB_state_TS = clock
     end    
     if mouse.LMB_state_TS and clock - mouse.LMB_state_TS > 0.2 and mouse.trig_LMB then mouse.trig_LMB = nil end 
     if mouse.last_mx_onclick and mouse.last_my_onclick then mouse.dx = mouse.mx - mouse.last_mx_onclick  mouse.dy = mouse.my - mouse.last_my_onclick else mouse.dx, mouse.dy = 0,0 end
 
-
-    -- butts    
+    -- buttons
+      for key in pairs(obj) do
+        if type(obj[key]) == 'table' and not obj[key].ignore_mouse  then
+          if MOUSE_Match(obj[key]) then mouse.context = key end
+          if mouse.LMB_trig and mouse.LMB_trig == 0 and MOUSE_Match(obj[key]) then if obj[key].func then  obj[key].func() end end
+          if mouse.LMB_trig and mouse.LMB_trig == 1 and MOUSE_Match(obj[key]) then if obj[key].func_DC then  obj[key].func_DC() end end
+          if mouse.LMB_state and (mouse.context == key or mouse.context_latch == key) then if obj[key].func_LD then obj[key].func_LD() end end
+          if mouse.RMB_state and  (mouse.context == key or mouse.context_latch == key) then if obj[key].func_RD then obj[key].func_RD() end end
+        end
+      end
+    --[[ butts    
     for key in pairs(obj) do
       if not key:match('knob') and type(obj[key]) == 'table' then
         if obj[key].is_but then  
@@ -1227,7 +1373,7 @@
           obj[key].func(obj[key].val)
         end
       end
-    end
+    end]]
     
     -- scroll
       if mouse.mx < obj.browser.x + obj.browser.w  and mouse.wheel_trig and mouse.wheel_trig ~= 0 then
@@ -1245,7 +1391,7 @@
       if mouse.last_LMB_state and not mouse.LMB_state   then  
         -- clear context
           mouse.context_latch = ''
-          mouse.context_latch_val = 0
+          mouse.context_latch_val = -1
         -- clear export state
           if action_export.state 
             and obj[ mouse.context ] 
@@ -1265,7 +1411,9 @@
       mouse.last_Ctrl_LMB_state = mouse.Ctrl_LMB_state
       mouse.last_Ctrl_state = mouse.Ctrl_state
       mouse.last_Alt_state = mouse.Alt_state
-      mouse.last_wheel = mouse.wheel      
+      mouse.last_wheel = mouse.wheel   
+      
+      mouse.LMB_trig = nil   
   end
   ---------------------------------------------------
   function ExportItemToRS5K(fn, note)
