@@ -1,5 +1,5 @@
 -- @description GUI template
--- @version 1.02
+-- @version 1.03
 -- @author MPL
 -- @changelog
 --   
@@ -10,14 +10,12 @@
   --  INIT -------------------------------------------------
   for key in pairs(reaper) do _G[key]=reaper[key]  end  
   local mouse = {}
-  takes = {}
   local gui -- see GUI_define()
   local obj = {}
   local conf = {}
   local cycle = 0
   local redraw = -1
-  local SCC, lastSCC, SCC_trig
-  local ProjState
+  local SCC, lastSCC, SCC_trig,ProjState
   ---------------------------------------------------
   local function lim(val, min,max) --local min,max 
     if not min or not max then min, max = 0,1 end 
@@ -30,7 +28,6 @@
   end
   ---------------------------------------------------
   local function msg(s)  ShowConsoleMsg(s..'\n') end
-  function deb(s)  if debug == 1 then ShowConsoleMsg(s..'\n') end end
   ---------------------------------------------------
   local function col(col_s, a) gfx.set( table.unpack(gui.col[col_s])) if a then gfx.a = a end  end
   ---------------------------------------------------
@@ -65,7 +62,6 @@
     -- redraw: -1 init, 1 maj changes, 2 minor changes
     -- 1 back
     -- 2 gradient
-    --// 3 dynamic stuff
       
     --  init
       if redraw == -1 then
@@ -167,7 +163,7 @@
                 state = 0,
                 is_but = true,
                 alpha_back = 0.2,
-                func =  function() GetTakes()end}
+                func =  function() end}
     
                       
   end
@@ -204,7 +200,7 @@
 
     -- butts    
     for key in pairs(obj) do
-      if not key:match('knob') and type(obj[key]) == 'table'and obj[key].is_but then
+      if type(obj[key]) == 'table'and obj[key].is_but then
         if MOUSE_Click(obj[key]) then obj[key].func() end
       end
     end
@@ -238,7 +234,7 @@
     gui = {
                 aa = 1,
                 mode = 3,
-                fontname = 'Calibri',
+                font = 'Calibri',
                 fontsz = 16,
                 col = { grey =    {0.5, 0.5,  0.5 },
                         white =   {1,   1,    1   },
