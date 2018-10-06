@@ -1,4 +1,9 @@
-
+-- @description test_Swap source of selected take and take under mouse
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
   reaper.BR_GetMouseCursorContext()
   take1 = reaper.BR_GetMouseCursorContext_Take()

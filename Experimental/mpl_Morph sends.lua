@@ -1,3 +1,9 @@
+-- @description test_Morph Sends
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
   s = 150
   pow = 3

@@ -1,4 +1,9 @@
-
+-- @description test_Sort project folder garbage
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
 -- 24.12.2015 moved to test repo - has bugs
 

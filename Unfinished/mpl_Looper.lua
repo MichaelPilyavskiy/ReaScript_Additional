@@ -1,4 +1,9 @@
-
+-- @description test_Looper
+-- @version 1.0
+-- @author MPL
+-- @changelog
+--    # test
+-- @website http://forum.cockos.com/member.php?u=70694
 
   vrs = '1.0alpha3'
   name = 'MPL Looper'  

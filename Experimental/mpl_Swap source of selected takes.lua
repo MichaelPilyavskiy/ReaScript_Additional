@@ -1,4 +1,9 @@
-
+-- @description test_Swap source of selected takes
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
   sel_item = reaper.GetSelectedMediaItem(0,0)
   if sel_item ~= nil then take1 = reaper.GetActiveTake(sel_item) end  

@@ -1,3 +1,9 @@
+-- @description test_TS and tempo randomizer
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
 -- MPL TS and tempo randomizer
 

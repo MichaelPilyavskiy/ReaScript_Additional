@@ -1,4 +1,4 @@
--- @description Warp grid to selected item stretch markers
+-- @description test_Warp grid to selected item stretch markers
 -- @version 1.01
 -- @author MPL
 -- @website http://forum.cockos.com/showthread.php?t=188335

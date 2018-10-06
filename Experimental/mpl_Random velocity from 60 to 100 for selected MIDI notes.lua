@@ -1,3 +1,10 @@
+-- @description test_Random velocity from 60 to 100 for selected MIDI notes
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
+
   scr_title = 'MPL test random velocity from 60 to 100 for selected MIDI notes'
   
   vel_min = 10

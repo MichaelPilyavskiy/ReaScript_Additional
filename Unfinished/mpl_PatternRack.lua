@@ -1,3 +1,10 @@
+﻿-- @description test_PatternRack'
+-- @version 1.04
+-- @author MPL
+-- @changelog
+--    # test
+-- @website http://forum.cockos.com/member.php?u=70694
+
   --------------------------------------------------------------------
 
   vrs = '1.04'

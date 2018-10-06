@@ -1,3 +1,9 @@
+-- @description test_touchscr GUI for sel item
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
 -- http://forum.cockos.com/showthread.php?t=188039
 -- touchscr GUI for sel item

@@ -1,4 +1,4 @@
--- @description Assign MIDIOSC control with FX envelope under mouse cursor
+-- @description test_Assign MIDIOSC control with FX envelope under mouse cursor
 -- @version 1.04
 -- @author MPL
 -- @changelog

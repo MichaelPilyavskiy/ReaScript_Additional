@@ -1,4 +1,9 @@
-
+-- @description test_Record take (prompt for filename)
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
 
   _, _, sec, cmd = reaper.get_action_context()
   state = reaper.GetToggleCommandStateEx( sec, cmd )

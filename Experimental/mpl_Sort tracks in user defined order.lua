@@ -1,3 +1,10 @@
+-- @description test_Sort tracks in user defined order
+-- @version 1.0
+-- @author MPL
+-- @website http://forum.cockos.com/member.php?u=70694
+-- @changelog
+--    + test
+
 
   names = {'kick',
             'snare',
