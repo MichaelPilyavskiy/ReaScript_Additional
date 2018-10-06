@@ -1,60 +1,431 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="14482245f35a3279e9072648ae7aa61d0a5ff13a" name="MPL_Test">
-  <category name="Test">
-    <reapack name="mpl_ProjectPlaylist.lua" type="script" desc="ProjectPlaylist">
+<index version="1" commit="a4f2d95e32d3aac169f2b63fc13402f15dce4283" name="MPL_Test">
+  <category name="Custom/mpl_RS5k_manager_control">
+    <reapack name="mpl_Decrement 1 unit maximum Velocity (RS5k manager).lua" type="script" desc="Decrement 1 unit maximum Velocity (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201%20unit%20maximum%20Velocity%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 1 unit minimum Velocity (RS5k manager).lua" type="script" desc="Decrement 1 unit minimum Velocity (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201%20unit%20minimum%20Velocity%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms attack (RS5k manager).lua" type="script" desc="Decrement 10ms attack (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20attack%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms decay (RS5k manager).lua" type="script" desc="Decrement 10ms decay (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20decay%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms loop start offset (RS5k manager).lua" type="script" desc="Decrement 10ms loop start offset (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20loop%20start%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms noteoff release override (RS5k manager).lua" type="script" desc="Decrement 10ms noteoff release override (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20noteoff%20release%20override%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms release (RS5k manager).lua" type="script" desc="Decrement 10ms release (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20release%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 10ms xfade (RS5k manager).lua" type="script" desc="Decrement 10ms xfade (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%2010ms%20xfade%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 1ms attack (RS5k manager).lua" type="script" desc="Decrement 1ms attack (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201ms%20attack%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 1ms decay (RS5k manager).lua" type="script" desc="Decrement 1ms decay (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201ms%20decay%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 1ms release (RS5k manager).lua" type="script" desc="Decrement 1ms release (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201ms%20release%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement 1ms xfade (RS5k manager) .lua" type="script" desc="Decrement 1ms xfade (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%201ms%20xfade%20(RS5k%20manager)%20.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement sample end offset (RS5k manager).lua" type="script" desc="Decrement sample end offset (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%20sample%20end%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement sample start offset (RS5k manager).lua" type="script" desc="Decrement sample start offset (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%20sample%20start%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Decrement sustain (RS5k manager).lua" type="script" desc="Decrement sustain (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Decrement%20sustain%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1 unit maximum Velocity (RS5k manager).lua" type="script" desc="Increment 1 unit maximum Velocity (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201%20unit%20maximum%20Velocity%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1 unit minimum Velocity (RS5k manager).lua" type="script" desc="Increment 1 unit minimum Velocity (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201%20unit%20minimum%20Velocity%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms attack (RS5k manager).lua" type="script" desc="Increment 10ms attack (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20attack%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms decay (RS5k manager).lua" type="script" desc="Increment 10ms decay (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20decay%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms loop start offset (RS5k manager).lua" type="script" desc="Increment 10ms loop start offset (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20loop%20start%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms noteoff release override (RS5k manager).lua" type="script" desc="Increment 10ms noteoff release override (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20noteoff%20release%20override%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms release (RS5k manager).lua" type="script" desc="Increment 10ms release (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20release%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 10ms xfade (RS5k manager).lua" type="script" desc="Increment 10ms xfade (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%2010ms%20xfade%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1ms attack (RS5k manager).lua" type="script" desc="Increment 1ms attack (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201ms%20attack%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1ms decay (RS5k manager).lua" type="script" desc="Increment 1ms decay (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201ms%20decay%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1ms release (RS5k manager).lua" type="script" desc="Increment 1ms release (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201ms%20release%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment 1ms xfade (RS5k manager).lua" type="script" desc="Increment 1ms xfade (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%201ms%20xfade%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment sample end offset (RS5k manager).lua" type="script" desc="Increment sample end offset (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%20sample%20end%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment sample start offset (RS5k manager).lua" type="script" desc="Increment sample start offset (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%20sample%20start%20offset%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increment sustain (RS5k manager).lua" type="script" desc="Increment sustain (RS5k manager).lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Increment%20sustain%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pan 1% left (RS5k manager).lua" type="script" desc="Pan 1% left (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pan%201%25%20left%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pan 1% right (RS5k manager).lua" type="script" desc="Pan 1% right (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pan%201%25%20right%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pitch 1 octave down (RS5k manager).lua" type="script" desc="Pitch 1 octave down (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pitch%201%20octave%20down%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pitch 1 octave up (RS5k manager).lua" type="script" desc="Pitch 1 octave down (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pitch%201%20octave%20up%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pitch 1 semitone down (RS5k manager).lua" type="script" desc="Pitch 1 semitone down (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pitch%201%20semitone%20down%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Pitch 1 semitone up (RS5k manager).lua" type="script" desc="Pitch 1 semitone up (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Pitch%201%20semitone%20up%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set filter played notes off (RS5k manager).lua" type="script" desc="Set filter played notes off (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20filter%20played%20notes%20off%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set filter played notes on (RS5k manager).lua" type="script" desc="Set filter played notes on (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20filter%20played%20notes%20on%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set loop off (RS5k manager).lua" type="script" desc="Set loop off (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20loop%20off%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set loop on (RS5k manager).lua" type="script" desc="Set loop on (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20loop%20on%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set roundrobin off (RS5k manager).lua" type="script" desc="Set roundrobin off (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20roundrobin%20off%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set roundrobin on (RS5k manager).lua" type="script" desc="Set roundrobin on (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20roundrobin%20on%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set use note-off release override off (RS5k manager).lua" type="script" desc="Set use note-off release override off (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20use%20note-off%20release%20override%20off%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Set use note-off release override on (RS5k manager).lua" type="script" desc="Set use note-off release override on (RS5k manager)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-06T17:29:34Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/a4f2d95e32d3aac169f2b63fc13402f15dce4283/Custom/mpl_RS5k_manager_control/mpl_Set%20use%20note-off%20release%20override%20on%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Experimental">
+    <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="Assign MIDIOSC control with FX envelope under mouse cursor">
       <metadata>
         <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
       </metadata>
-      <version name="0.01" author="MPL" time="2017-07-01T13:18:06Z">
+      <version name="1.04" author="MPL" time="2018-08-21T05:32:03Z">
+        <changelog><![CDATA[# fix wrong decoding MIDI integer]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/5f0a32ba2170596c096ef245225b52f985f94909/Experimental/mpl_Assign%20MIDIOSC%20control%20with%20FX%20envelope%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Warp grid to selected item stretch markers.lua" type="script" desc="Warp grid to selected item stretch markers">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2018-08-21T05:32:03Z">
+        <changelog><![CDATA[+ denominator ratio]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/5f0a32ba2170596c096ef245225b52f985f94909/Experimental/mpl_Warp%20grid%20to%20selected%20item%20stretch%20markers.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Templates">
+    <reapack name="gui_tmpl.lua" type="script" desc="MIDI map generator">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-08-21T05:32:03Z">
         <changelog><![CDATA[+ init]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/ba5e9602496bffbed8ee1dba5945822c6b2bf376/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.02" author="MPL" time="2017-07-01T13:58:03Z">
-        <changelog><![CDATA[+ init]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/50012897f4868f1849c582790c2e44c6b5d873fa/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.10" author="MPL" time="2017-07-02T06:50:37Z">
-        <changelog><![CDATA[+ init]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/c18c70fbb0eebd252af56191bb7431c7dc42b39d/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.11" author="MPL" time="2017-07-02T07:19:48Z">
-        <changelog><![CDATA[+ init]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/e4f9ccd0c9adc771af1cd672f846108dada6cf6a/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.20" author="MPL" time="2017-07-02T10:14:12Z">
-        <changelog><![CDATA[progress bar
-active state
-playing state
-clickable play buttons
-dragndrop
-redraw background/static buttons fix
-small menu button
-add current opened projects at startup]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/c92de1a81d3794758d4c9ade09c1c5aa77352ccd/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.25" author="MPL" time="2017-07-02T13:26:46Z">
-        <changelog><![CDATA[# redraw and update playlist if project closed manually]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/952cd484158504ef712c49954218e7e59a2ba164/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.30" author="MPL" time="2017-07-03T19:14:57Z">
-        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/38ef26158af3ec0ab7f343976572e2b914a6e57a/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.40" author="MPL" time="2017-07-04T20:33:19Z">
-        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/8fc1e94dfde3a85a8b66424be0232c3f687908ad/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.50" author="MPL" time="2017-07-05T18:38:38Z">
-        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/dd5ceba0a4a75f0f98e1af9b95f47aba881e7731/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.60" author="MPL" time="2017-07-05T21:54:02Z">
-        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/b4c5843e20dd5f5c089223ea33c6db3a0946073b/Test/mpl_ProjectPlaylist.lua</source>
-      </version>
-      <version name="0.61" author="MPL" time="2017-07-06T17:41:35Z">
-        <changelog><![CDATA[# different fixes and improvements, see changelog]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/14482245f35a3279e9072648ae7aa61d0a5ff13a/Test/mpl_ProjectPlaylist.lua</source>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript-Test/raw/5f0a32ba2170596c096ef245225b52f985f94909/Templates/gui_tmpl.lua</source>
       </version>
     </reapack>
   </category>
