@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="32af746fba2f9071a1663f1d96252b39d00de5c6">
+<index version="1" name="MPL_Additional" commit="0c59c73150974aa46893bd45a5edf1bbe85766db">
   <category name="Experimental">
     <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="test_Assign MIDIOSC control with FX envelope under mouse cursor">
       <metadata>
@@ -433,6 +433,33 @@
       <version name="1.0" author="MPL" time="2018-10-06T17:48:26Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/32af746fba2f9071a1663f1d96252b39d00de5c6/mpl_RS5k_manager_control/mpl_Pitch%201%20semitone%20up%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_RS5k manager control functions - Last touched FX mode.lua" type="script" desc="RS5k manager control functions - Last touched FX mode.lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-07T05:49:32Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/0c59c73150974aa46893bd45a5edf1bbe85766db/mpl_RS5k_manager_control/mpl_RS5k%20manager%20control%20functions%20-%20Last%20touched%20FX%20mode.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_RS5k manager control functions - RS5k mode.lua" type="script" desc="RS5k manager control functions - RS5k mode.lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-07T05:49:32Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/0c59c73150974aa46893bd45a5edf1bbe85766db/mpl_RS5k_manager_control/mpl_RS5k%20manager%20control%20functions%20-%20RS5k%20mode.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_RS5k manager control functions - Selected track mode.lua" type="script" desc="RS5k manager control functions - Selected track mode.lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2018-10-07T05:49:32Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/0c59c73150974aa46893bd45a5edf1bbe85766db/mpl_RS5k_manager_control/mpl_RS5k%20manager%20control%20functions%20-%20Selected%20track%20mode.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Set filter played notes off (RS5k manager).lua" type="script" desc="Set filter played notes off (RS5k manager)">
