@@ -5,6 +5,28 @@
 
   -----------------------------------------------------------------------   
   function SetGlobalParam(val, param, incr)
+    ret1, mode = reaper.GetProjExtState( 0, 'MPLRS5KMANAGEFUNC', 'MODE' )
+    if ret1 == 1 then
+      if mode == 0 then -- rs5k manager
+        SetGlobalParam_RS5k(val, param, incr)
+       elseif mode == 1 then -- track of focused fx
+        local retval, tracknumber = reaper.GetFocusedFX()
+        local tr =  CSurf_TrackFromID( tracknumber, false )
+        SetGlobalParam_sub(tr, param, val, incr)  
+       elseif mode == 2 then -- selected track
+        tr = GetSelectedTrack( 0, 0 )
+        SetGlobalParam_sub(tr, param, val, incr) 
+      end
+     else
+      SetGlobalParam_RS5k(val, param, incr)
+    end
+    
+    
+    
+    
+  end
+  --------------------------------------------------------
+  function SetGlobalParam_RS5k(val, param, incr)
     local tr 
     local haspintrack = reaper.GetExtState('MPL_RS5K manager', 'pintrack')
     if not haspintrack or not tonumber(haspintrack) then return end
@@ -27,10 +49,11 @@
         local desttr = reaper.BR_GetMediaTrackSendInfo_Track( tr, 0, sid-1, 1 )
         SetGlobalParam_sub(desttr, param, val, incr)
       end
-    end    
-  end
-  ----------------------------  
-  function SetGlobalParam_sub(tr, param, val, incr)    
+    end 
+  end  
+  --------------------------------------------------------
+  function SetGlobalParam_sub(tr, param, val, incr)   
+    if not tr then return end 
     for fxid = 1,  reaper.TrackFX_GetCount( tr ) do
       -- validate RS5k by param names
         local retval, p3 = reaper.TrackFX_GetParamName( tr, fxid-1, 3, '' )
