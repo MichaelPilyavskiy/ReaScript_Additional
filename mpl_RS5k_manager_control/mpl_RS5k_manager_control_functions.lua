@@ -7,13 +7,13 @@
   function SetGlobalParam(val, param, incr)
     ret1, mode = reaper.GetProjExtState( 0, 'MPLRS5KMANAGEFUNC', 'MODE' )
     if ret1 == 1 then
-      if mode == 0 then -- rs5k manager
+      if tonumber(mode) == 0 then -- rs5k manager
         SetGlobalParam_RS5k(val, param, incr)
-       elseif mode == 1 then -- track of focused fx
+       elseif  tonumber(mode)== 1 then -- track of focused fx
         local retval, tracknumber = reaper.GetFocusedFX()
         local tr =  CSurf_TrackFromID( tracknumber, false )
         SetGlobalParam_sub(tr, param, val, incr)  
-       elseif mode == 2 then -- selected track
+       elseif  tonumber(mode)== 2 then -- selected track
         tr = GetSelectedTrack( 0, 0 )
         SetGlobalParam_sub(tr, param, val, incr) 
       end
