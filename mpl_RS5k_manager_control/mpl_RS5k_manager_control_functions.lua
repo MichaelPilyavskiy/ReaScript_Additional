@@ -1,7 +1,7 @@
 -- @description RS5k_manager_control_functions
 -- @author MPL
 -- @website http://forum.cockos.com/member.php?u=70694
--- @noindex
+-- @version 1.01
 
   -----------------------------------------------------------------------   
   function SetGlobalParam(val, param, incr)
