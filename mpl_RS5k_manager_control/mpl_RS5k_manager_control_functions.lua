@@ -1,7 +1,7 @@
 -- @description RS5k_manager_control_functions
 -- @author MPL
 -- @website http://forum.cockos.com/member.php?u=70694
--- @version 1.02
+-- @version 1.03
 
   -----------------------------------------------------------------------   
   function SetGlobalParam(val, param, incr)
@@ -10,9 +10,9 @@
       if tonumber(mode) == 0 then -- rs5k manager
         SetGlobalParam_RS5k(val, param, incr)
        elseif  tonumber(mode)== 1 then -- track of focused fx
-        local retval, tracknumber = reaper.GetFocusedFX()
+        local retval, tracknumber, itemnumber, fxnumber = reaper.GetFocusedFX()
         local tr =  CSurf_TrackFromID( tracknumber, false )
-        SetGlobalParam_sub(tr, param, val, incr)  
+        SetGlobalParam_sub(tr, param, val, incr, fxnumber)  
        elseif  tonumber(mode)== 2 then -- selected track
         tr = GetSelectedTrack( 0, 0 )
         SetGlobalParam_sub(tr, param, val, incr) 
@@ -20,8 +20,6 @@
      else
       SetGlobalParam_RS5k(val, param, incr)
     end
-    
-    
     
     
   end
@@ -52,50 +50,52 @@
     end 
   end  
   --------------------------------------------------------
-  function SetGlobalParam_sub(tr, param, val, incr)   
+  function SetGlobalParam_sub(tr, param, val, incr, fxnumber)   
     if not tr then return end 
     for fxid = 1,  reaper.TrackFX_GetCount( tr ) do
-      -- validate RS5k by param names
-        local retval, p3 = reaper.TrackFX_GetParamName( tr, fxid-1, 3, '' )
-        local retval, p4 = reaper.TrackFX_GetParamName( tr, fxid-1, 4, '' )
-        local isRS5k = retval and p3:match('range')~= nil and p4:match('range')~= nil
-        if not isRS5k then goto skipFX end
-      
-      if val then 
-        reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, val)
-       elseif incr then
-        local val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, param) 
-        --reaper.ShowConsoleMsg((val )..'\n')
-        if param == 9 or param == 10 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/2000)) )
-         elseif param == 1 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr)) )
-         elseif param == 15 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/160)) )
-         elseif param == 22 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/1000)) )
-         elseif param == 13 then
-          local end_val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, 14 ) -0.001
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(end_val,val + incr)) )
-         elseif param == 14 then
-          local st_val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, 13 ) +0.001
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(st_val,math.min(1,val + incr)) ) 
-         elseif param == 17 or param == 18 then -- velocity max
-          local val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, param ) 
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/127)) )  
-         elseif param == 23 then -- loop offs
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/30000)) )                   
-         elseif param == 24 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/14990)) )                   
-         elseif param == 25 then -- sustain
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr)) )                 
-          
-         elseif param == 26 then
-          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/4000)) )                   
-          
-        end
-      end
+      if (fxnumber and fxid == fxnumber) or not fxnumber then
+        -- validate RS5k by param names
+          local retval, p3 = reaper.TrackFX_GetParamName( tr, fxid-1, 3, '' )
+          local retval, p4 = reaper.TrackFX_GetParamName( tr, fxid-1, 4, '' )
+          local isRS5k = retval and p3:match('range')~= nil and p4:match('range')~= nil
+          if not isRS5k then goto skipFX end
         
-      ::skipFX::
+        if val then 
+          reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, val)
+         elseif incr then
+          local val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, param) 
+          --reaper.ShowConsoleMsg((val )..'\n')
+          if param == 9 or param == 10 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/2000)) )
+           elseif param == 1 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr)) )
+           elseif param == 15 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/160)) )
+           elseif param == 22 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/1000)) )
+           elseif param == 13 then
+            local end_val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, 14 ) -0.001
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(end_val,val + incr)) )
+           elseif param == 14 then
+            local st_val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, 13 ) +0.001
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(st_val,math.min(1,val + incr)) ) 
+           elseif param == 17 or param == 18 then -- velocity max
+            local val = reaper.TrackFX_GetParamNormalized( tr, fxid-1, param ) 
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/127)) )  
+           elseif param == 23 then -- loop offs
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/30000)) )                   
+           elseif param == 24 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/14990)) )                   
+           elseif param == 25 then -- sustain
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr)) )                 
+            
+           elseif param == 26 then
+            reaper.TrackFX_SetParamNormalized( tr, fxid-1, param, math.max(0,math.min(1,val + incr/4000)) )                   
+            
+          end
+        end
+          
+        ::skipFX::
+      end
     end 
   end
