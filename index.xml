@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="b3cbde8dc48d46dd1eff13d6af5c59bbfc991269">
+<index version="1" name="MPL_Additional" commit="4efd10fa4c833f6d7f585829883a2cb48ea89fbe">
   <category name="Experimental">
     <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="test_Assign MIDIOSC control with FX envelope under mouse cursor">
       <metadata>
@@ -483,6 +483,9 @@
       </version>
       <version name="1.02" author="MPL" time="2018-10-08T18:57:41Z">
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b3cbde8dc48d46dd1eff13d6af5c59bbfc991269/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
+      </version>
+      <version name="1.03" author="MPL" time="2018-10-09T20:37:29Z">
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/4efd10fa4c833f6d7f585829883a2cb48ea89fbe/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Set filter played notes off (RS5k manager).lua" type="script" desc="Set filter played notes off (RS5k manager)">
