@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="4efd10fa4c833f6d7f585829883a2cb48ea89fbe">
+<index version="1" name="MPL_Additional" commit="c97165ddde8e15b1261a579be5ff209abcc61193">
   <category name="Experimental">
     <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="test_Assign MIDIOSC control with FX envelope under mouse cursor">
       <metadata>
@@ -8,15 +8,6 @@
       <version name="1.04" author="MPL" time="2018-08-21T05:32:03Z">
         <changelog><![CDATA[# fix wrong decoding MIDI integer]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/5f0a32ba2170596c096ef245225b52f985f94909/Experimental/mpl_Assign%20MIDIOSC%20control%20with%20FX%20envelope%20under%20mouse%20cursor.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mpl_datron_GUI.lua" type="script" desc="test_DatronGUI">
-      <metadata>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="1.0" author="MPL" time="2018-10-06T17:44:17Z">
-        <changelog><![CDATA[+ test]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b657695bf81fd0393e8b3baeabbd93402edec1b2/Experimental/mpl_datron_GUI.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Morph sends.lua" type="script" desc="test_Morph Sends">
@@ -487,6 +478,11 @@
       <version name="1.03" author="MPL" time="2018-10-09T20:37:29Z">
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/4efd10fa4c833f6d7f585829883a2cb48ea89fbe/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
       </version>
+      <version name="1.04" author="MPL" time="2018-11-07T04:50:29Z">
+        <changelog><![CDATA[# use lasttouched instead focused
+# fix check 0-based index instead of 1-based]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/418166354d24c245861468fbd97190ac05c082a2/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
+      </version>
     </reapack>
     <reapack name="mpl_Set filter played notes off (RS5k manager).lua" type="script" desc="Set filter played notes off (RS5k manager)">
       <metadata>
@@ -558,26 +554,6 @@
       <version name="1.0" author="MPL" time="2018-10-06T17:48:26Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/32af746fba2f9071a1663f1d96252b39d00de5c6/mpl_RS5k_manager_control/mpl_Set%20use%20note-off%20release%20override%20on%20(RS5k%20manager).lua</source>
-      </version>
-    </reapack>
-  </category>
-  <category name="Unfinished">
-    <reapack name="mpl_Looper.lua" type="script" desc="test_Looper">
-      <metadata>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="1.0" author="MPL" time="2018-10-06T17:44:17Z">
-        <changelog><![CDATA[# test]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b657695bf81fd0393e8b3baeabbd93402edec1b2/Unfinished/mpl_Looper.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mpl_PatternRack.lua" type="script" desc="test_PatternRack'">
-      <metadata>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="1.04" author="MPL" time="2018-10-06T17:44:17Z">
-        <changelog><![CDATA[# test]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b657695bf81fd0393e8b3baeabbd93402edec1b2/Unfinished/mpl_PatternRack.lua</source>
       </version>
     </reapack>
   </category>
