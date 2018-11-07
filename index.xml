@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="c97165ddde8e15b1261a579be5ff209abcc61193">
+<index version="1" name="MPL_Additional" commit="238153b99ce91521db213b2743d41c5bfc580408">
   <category name="Experimental">
     <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="test_Assign MIDIOSC control with FX envelope under mouse cursor">
       <metadata>
@@ -426,6 +426,15 @@
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/32af746fba2f9071a1663f1d96252b39d00de5c6/mpl_RS5k_manager_control/mpl_Pitch%201%20semitone%20up%20(RS5k%20manager).lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_RS5k manager control functions - Focused FX mode.lua" type="script" desc="RS5k manager control functions - Focused FX mode.lua">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.00" author="MPL" time="2018-11-07T19:46:48Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/238153b99ce91521db213b2743d41c5bfc580408/mpl_RS5k_manager_control/mpl_RS5k%20manager%20control%20functions%20-%20Focused%20FX%20mode.lua</source>
+      </version>
+    </reapack>
     <reapack name="mpl_RS5k manager control functions - Last touched FX mode.lua" type="script" desc="RS5k manager control functions - Last touched FX mode.lua">
       <metadata>
         <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
@@ -482,6 +491,10 @@
         <changelog><![CDATA[# use lasttouched instead focused
 # fix check 0-based index instead of 1-based]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/418166354d24c245861468fbd97190ac05c082a2/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
+      </version>
+      <version name="1.05" author="MPL" time="2018-11-07T19:46:48Z">
+        <changelog><![CDATA[+ focused FX mode]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/238153b99ce91521db213b2743d41c5bfc580408/mpl_RS5k_manager_control/mpl_RS5k_manager_control_functions.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Set filter played notes off (RS5k manager).lua" type="script" desc="Set filter played notes off (RS5k manager)">
