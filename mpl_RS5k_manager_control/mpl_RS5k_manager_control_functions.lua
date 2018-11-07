@@ -1,10 +1,9 @@
 -- @description RS5k_manager_control_functions
 -- @author MPL
 -- @website http://forum.cockos.com/member.php?u=70694
--- @version 1.04
+-- @version 1.05
 -- @changelog
---    # use lasttouched instead focused
---    # fix check 0-based index instead of 1-based
+--    + focused FX mode
 
   -----------------------------------------------------------------------   
   function SetGlobalParam(val, param, incr)
@@ -12,14 +11,17 @@
     if ret1 == 1 then
       if tonumber(mode) == 0 then -- rs5k manager
         SetGlobalParam_RS5k(val, param, incr)
-       elseif  tonumber(mode)== 1 then -- track of focused fx
-        --local retval, tracknumber, itemnumber, fxnumber = reaper.GetFocusedFX()
+       elseif  tonumber(mode)== 1 then 
          local retval, tracknumber, fxnumber, paramnumber = reaper.GetLastTouchedFX()
          local tr =  CSurf_TrackFromID( tracknumber, false )
         SetGlobalParam_sub(tr, param, val, incr, fxnumber)  
        elseif  tonumber(mode)== 2 then -- selected track
         local tr = GetSelectedTrack( 0, 0 )
         SetGlobalParam_sub(tr, param, val, incr) 
+       elseif  tonumber(mode)== 3 then -- focused fx
+        local retval, tracknumber, itemnumber, fxnumber = reaper.GetFocusedFX()
+         local tr =  CSurf_TrackFromID( tracknumber, false )
+        SetGlobalParam_sub(tr, param, val, incr, fxnumber)       
       end
      else
       SetGlobalParam_RS5k(val, param, incr)
