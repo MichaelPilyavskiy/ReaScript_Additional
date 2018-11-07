@@ -1,20 +1,24 @@
 -- @description RS5k_manager_control_functions
 -- @author MPL
 -- @website http://forum.cockos.com/member.php?u=70694
--- @version 1.03
+-- @version 1.04
+-- @changelog
+--    # use lasttouched instead focused
+--    # fix check 0-based index instead of 1-based
 
   -----------------------------------------------------------------------   
   function SetGlobalParam(val, param, incr)
-    ret1, mode = reaper.GetProjExtState( 0, 'MPLRS5KMANAGEFUNC', 'MODE' )
+    local ret1, mode = reaper.GetProjExtState( 0, 'MPLRS5KMANAGEFUNC', 'MODE' )
     if ret1 == 1 then
       if tonumber(mode) == 0 then -- rs5k manager
         SetGlobalParam_RS5k(val, param, incr)
        elseif  tonumber(mode)== 1 then -- track of focused fx
-        local retval, tracknumber, itemnumber, fxnumber = reaper.GetFocusedFX()
-        local tr =  CSurf_TrackFromID( tracknumber, false )
+        --local retval, tracknumber, itemnumber, fxnumber = reaper.GetFocusedFX()
+         local retval, tracknumber, fxnumber, paramnumber = reaper.GetLastTouchedFX()
+         local tr =  CSurf_TrackFromID( tracknumber, false )
         SetGlobalParam_sub(tr, param, val, incr, fxnumber)  
        elseif  tonumber(mode)== 2 then -- selected track
-        tr = GetSelectedTrack( 0, 0 )
+        local tr = GetSelectedTrack( 0, 0 )
         SetGlobalParam_sub(tr, param, val, incr) 
       end
      else
@@ -50,10 +54,10 @@
     end 
   end  
   --------------------------------------------------------
-  function SetGlobalParam_sub(tr, param, val, incr, fxnumber)   
+  function SetGlobalParam_sub(tr, param, val, incr, fxnumber)  
     if not tr then return end 
     for fxid = 1,  reaper.TrackFX_GetCount( tr ) do
-      if (fxnumber and fxid == fxnumber) or not fxnumber then
+      if (fxnumber and fxid-1 == fxnumber) or not fxnumber then
         -- validate RS5k by param names
           local retval, p3 = reaper.TrackFX_GetParamName( tr, fxid-1, 3, '' )
           local retval, p4 = reaper.TrackFX_GetParamName( tr, fxid-1, 4, '' )
