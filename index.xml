@@ -1,74 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="1288ec341487910a5d275b2b0e7f5a68c6ecb7b0">
-  <category name="CustomDevelopement">
+<index version="1" name="MPL_Additional" commit="19252cffa1580a02c1268bb1e1ec47a825cf35ea">
+  <category name="CustomDevelopment">
     <reapack name="mpl_Glue selected items by custom defined counts.lua" type="script" desc="Glue selected items by custom defined counts">
-      <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[init ]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/CustomDevelopement/mpl_Glue%20selected%20items%20by%20custom%20defined%20counts.lua</source>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/CustomDevelopment/mpl_Glue%20selected%20items%20by%20custom%20defined%20counts.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Set selected items offset by custom defined shifts.lua" type="script" desc="Set selected items offset by custom defined shifts">
-      <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[init ]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/CustomDevelopement/mpl_Set%20selected%20items%20offset%20by%20custom%20defined%20shifts.lua</source>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/CustomDevelopment/mpl_Set%20selected%20items%20offset%20by%20custom%20defined%20shifts.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Split selected item at waveform rise above zero.lua" type="script" desc="Split selected item at waveform rise above zero">
-      <version name="1.02" author="MPL" time="2023-04-01T20:35:33Z">
+      <version name="1.02" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[# fix name and direction]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/CustomDevelopement/mpl_Split%20selected%20item%20at%20waveform%20rise%20above%20zero.lua</source>
-      </version>
-    </reapack>
-  </category>
-  <category name="Functions">
-    <reapack name="mpl_Various_functions.lua" type="script" desc="Various_functions">
-      <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
-{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
-\widowctrl\hyphauto
-
-{\pard \ql \f0 \sa180 \li0 \fi0 Functions used by MPL scripts.\par}
-}
-]]></description>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="3.41" author="MPL" time="2022-10-04T16:53:43Z">
-        <changelog><![CDATA[# VF_ReduceFXname]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions.lua</source>
-        <source file="mpl_Various_functions_v1.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions_v1.lua</source>
-        <source file="mpl_Various_functions_v3.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions_v3.lua</source>
-        <source file="mpl_Various_functions_GUI.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions_GUI.lua</source>
-        <source file="mpl_Various_functions_MOUSE.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions_MOUSE.lua</source>
-        <source file="mpl_Various_functions_Pers.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9303a13f6cc3fe1c976ac1a00896404497a01c2b/Functions/mpl_Various_functions_Pers.lua</source>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/CustomDevelopment/mpl_Split%20selected%20item%20at%20waveform%20rise%20above%20zero.lua</source>
       </version>
     </reapack>
   </category>
   <category name="Outdated unsupported">
-    <reapack name="mpl_Assign MIDIOSC control with FX envelope under mouse cursor.lua" type="script" desc="test_Assign MIDIOSC control with FX envelope under mouse cursor">
-      <metadata>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="1.04" author="MPL" time="2023-04-01T20:35:33Z">
-        <changelog><![CDATA[# fix wrong decoding MIDI integer]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Assign%20MIDIOSC%20control%20with%20FX%20envelope%20under%20mouse%20cursor.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mpl_Dump Retrospective Record log (old version).lua" type="script" desc="Dump Retrospective Record log (old version)">
-      <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
-{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
-\widowctrl\hyphauto
-
-{\pard \ql \f0 \sa180 \li0 \fi0 Dump recent MIDI messages log\par}
-}
-]]></description>
-        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
-      </metadata>
-      <version name="1.01" author="MPL, Justin" time="2022-10-04T20:02:47Z">
-        <changelog><![CDATA[# fix description, remove VF dependency]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/9f8784844c1cf8312ad34ef97dc5e4b1e071c9c2/Outdated%20unsupported/mpl_Dump%20Retrospective%20Record%20log%20(old%20version).lua</source>
-      </version>
-    </reapack>
     <reapack name="mpl_Generate JSFX skin.lua" type="script" desc="Generate JSFX skin">
       <metadata>
         <link rel="website">http://forum.cockos.com/showthread.php?t=233358</link>
@@ -143,6 +95,15 @@
       <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ test]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Record%20take%20(prompt%20for%20filename).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Sort plugins by vendor.lua" type="script" desc="Sort plugins by vendor">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.22" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix nil on 33 line]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_Sort%20plugins%20by%20vendor.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Sort project folder garbage.lua" type="script" desc="test_Sort project folder garbage">
@@ -263,6 +224,26 @@
       <version name="1.01" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ denominator ratio]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Warp%20grid%20to%20selected%20item%20stretch%20markers.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_WiredChain (background).lua" type="script" desc="WiredChain">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Script for handling FX chain data on selected track\par}
+}
+]]></description>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.22" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix FX list matching pattern]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_WiredChain%20(background).lua</source>
+        <source file="mpl_WiredChain_functions/mpl_WiredChain_GUI.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_WiredChain_functions/mpl_WiredChain_GUI.lua</source>
+        <source file="mpl_WiredChain_functions/mpl_WiredChain_MOUSE.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_WiredChain_functions/mpl_WiredChain_MOUSE.lua</source>
+        <source file="mpl_WiredChain_functions/mpl_WiredChain_data.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_WiredChain_functions/mpl_WiredChain_data.lua</source>
+        <source file="mpl_WiredChain_functions/mpl_WiredChain_obj.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Outdated%20unsupported/mpl_WiredChain_functions/mpl_WiredChain_obj.lua</source>
       </version>
     </reapack>
   </category>
@@ -715,6 +696,287 @@
       <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_RS5k_manager_control/mpl_Set%20use%20note-off%20release%20override%20on%20(RS5k%20manager).lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="SWS dependent/BR_EnvSetProperties">
+    <reapack name="mpl_Hide all track envelopes except envelope under mouse cursor.lua" type="script" desc="Hide all track envelopes except envelope under mouse cursor">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# update for use with REAPER 5.981+]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Hide%20all%20track%20envelopes%20except%20envelope%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Hide all track envelopes except last touched parameter envelope.lua" type="script" desc="Hide all track envelopes except last touched parameter envelope">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Hide%20all%20track%20envelopes%20except%20last%20touched%20parameter%20envelope.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Maximize selected tracks envelopes heights.lua" type="script" desc="Maximize selected tracks envelopes heights">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ internal cleanup
++ include Master track if selected]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Maximize%20selected%20tracks%20envelopes%20heights.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Minimize all tracks envelopes heights.lua" type="script" desc="Minimize all tracks envelopes heights">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# obey master track]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Minimize%20all%20tracks%20envelopes%20heights.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Minimize selected tracks envelopes heights.lua" type="script" desc="Minimize selected tracks envelopes heights">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ internal cleanup
++ include Master track if selected]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Minimize%20selected%20tracks%20envelopes%20heights.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Select active envelopes tracks.lua" type="script" desc="Select active envelopes tracks">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Select%20active%20envelopes%20tracks.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Show all active track envelopes, hide unactive.lua" type="script" desc="Show all active track envelopes, hide unactive">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Show%20all%20active%20track%20envelopes,%20hide%20unactive.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Show all armed track envelopes, hide unarmed.lua" type="script" desc="Show all armed track envelopes, hide unarmed">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Show%20all%20armed%20track%20envelopes,%20hide%20unarmed.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Show existing envelopes for last touched FX.lua" type="script" desc="Show existing envelopes for last touched FX">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# rename title]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_EnvSetProperties/mpl_Show%20existing%20envelopes%20for%20last%20touched%20FX.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="SWS dependent/BR_Win32_GetPrivateProfileString">
+    <reapack name="mpl_Create send from focused FX insert.lua" type="script" desc="Create send from focused FX insert">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.04" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix adding send to the last track in playlist]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Create%20send%20from%20focused%20FX%20insert.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Use chunking/envelope">
+    <reapack name="mpl_Decrease selected tracks envelopes heights.lua" type="script" desc="Decrease selected tracks envelopes heights">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# independent from SWS]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Decrease%20selected%20tracks%20envelopes%20heights.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Increase selected tracks envelopes heights.lua" type="script" desc="Increase selected tracks envelopes heights">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# independent from SWS]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Increase%20selected%20tracks%20envelopes%20heights.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Toggle bypass selected tracks envelopes (reset FX parameters).lua" type="script" desc="Toggle bypass selected tracks envelopes (reset FX parameters)">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.1" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# perform on master track]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Toggle%20bypass%20selected%20tracks%20envelopes%20(reset%20FX%20parameters).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Toggle bypass selected tracks envelopes.lua" type="script" desc="Toggle bypass selected tracks envelopes">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.1" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# perform on master track]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Toggle%20bypass%20selected%20tracks%20envelopes.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Toggle bypass trim envelope.lua" type="script" desc="Toggle bypass trim envelope">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ Init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Toggle%20bypass%20trim%20envelope.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Use chunking/FX">
+    <reapack name="mpl_Copy Focused FX data.lua" type="script" desc="Copy Focused FX data">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ support parameters copypaste]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Copy%20Focused%20FX%20data.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Hide all selected tracks FX embedded UI in MCP.lua" type="script" desc="Hide all selected tracks FX embedded UI in MCP">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Hide%20all%20selected%20tracks%20FX%20embedded%20UI%20in%20MCP.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Load selected tracks FX chains by name, offline mode.lua" type="script" desc="Load selected tracks FX chains by name, offline mode">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?p=2137484</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix uncomment offline]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Load%20selected%20tracks%20FX%20chains%20by%20name,%20offline%20mode.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Load selected tracks FX chains by name.lua" type="script" desc="Load selected tracks FX chains by name">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?p=2137484</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix empty chain]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Load%20selected%20tracks%20FX%20chains%20by%20name.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Move focused Track FX to screen center.lua" type="script" desc="Move focused Track FX to screen center">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# improve fix chunk modification]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Move%20focused%20Track%20FX%20to%20screen%20center.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Paste Focused FX data.lua" type="script" desc="Paste Focused FX data">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ support parameters copypaste]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Paste%20Focused%20FX%20data.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Save selected tracks FX chains (no prompt, saved project only).lua" type="script" desc="Save selected tracks FX chains (no prompt, saved project only)">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ use wildcards (editable inside script)]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Save%20selected%20tracks%20FX%20chains%20(no%20prompt,%20saved%20project%20only).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Save selected tracks FX chains.lua" type="script" desc="Save selected tracks FX chains">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?p=2137484</link>
+      </metadata>
+      <version name="1.06" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix loading ext config]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Save%20selected%20tracks%20FX%20chains.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Show selected tracks first FX embedded UI in MCP.lua" type="script" desc="Show selected tracks first FX embedded UI in MCP">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Show%20selected%20tracks%20first%20FX%20embedded%20UI%20in%20MCP.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Use chunking/track">
+    <reapack name="mpl_Add FXChain to selected track.lua" type="script" desc="Add FXChain to selected track">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix path]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/track/mpl_Add%20FXChain%20to%20selected%20track.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Use chunking_but_available_to_use_API">
+    <reapack name="mpl_Copy LFO settings from last touched FX parameter.lua" type="script" desc="Copy LFO settings from last touched FX parameter">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Copy%20LFO%20settings%20from%20last%20touched%20FX%20parameter.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Paste LFO settings for last touched FX parameter.lua" type="script" desc="Paste LFO settings for last touched FX parameter">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Paste%20LFO%20settings%20for%20last%20touched%20FX%20parameter.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_ReplaceFX.lua" type="script" desc="ReplaceFX">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Script for replacing FX by name\par}
+}
+]]></description>
+      </metadata>
+      <version name="1.04" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[# fix formatting fx name]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_ReplaceFX.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Split focused plugin into to left right instances.lua" type="script" desc="Split focused plugin into to left right instances">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Split%20focused%20plugin%20into%20to%20left%20right%20instances.lua</source>
       </version>
     </reapack>
   </category>
