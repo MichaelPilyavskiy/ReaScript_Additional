@@ -1,0 +1,3 @@
+mpl_InstrumentRack.lua
+mpl_Stretch item to project tempo
+Snap takes to scale
