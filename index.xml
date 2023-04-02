@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="b07b32563d529a1a4851af513b9b1171a6e9aefb">
+<index version="1" name="MPL_Additional" commit="762cf20b8488f72da8e65684929cdce77c1993c2">
   <category name="CustomDevelopment">
     <reapack name="mpl_Glue selected items by custom defined counts.lua" type="script" desc="Glue selected items by custom defined counts">
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
@@ -17,6 +17,18 @@
       <version name="1.02" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[# fix name and direction]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/CustomDevelopment/mpl_Split%20selected%20item%20at%20waveform%20rise%20above%20zero.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="JS API dependent/JS_Dialog_BrowseForSaveFile">
+    <reapack name="mpl_Generate CUE from project markers.lua" type="script" desc="Generate CUE from project markers">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.07" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# 1-based markers count
+# exculde number sign from marker name]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/JS%20API%20dependent/JS_Dialog_BrowseForSaveFile/mpl_Generate%20CUE%20from%20project%20markers.lua</source>
       </version>
     </reapack>
   </category>
@@ -82,6 +94,42 @@ add control for timefall showing last note]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b07b32563d529a1a4851af513b9b1171a6e9aefb/Outdated%20unsupported/mpl_Add%20note%20beetween%20two%20selected.lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_Add receive track from selected tracks.lua" type="script" desc="Add receive track from selected tracks">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# change name]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Add%20receive%20track%20from%20selected%20tracks.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Add receive tracks to selected tracks respectively.lua" type="script" desc="Add receive tracks to selected tracks respectively">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# change name]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Add%20receive%20tracks%20to%20selected%20tracks%20respectively.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Add to render queue selected tracks with their parents.lua" type="script" desc="Add to render queue selected tracks with their parents">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# fix check for external package]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Add%20to%20render%20queue%20selected%20tracks%20with%20their%20parents.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Add to render queue selected tracks with their sends.lua" type="script" desc="Add to render queue selected tracks with their sends">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# fix check for external package]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Add%20to%20render%20queue%20selected%20tracks%20with%20their%20sends.lua</source>
+      </version>
+    </reapack>
     <reapack name="mpl_Comb-filtering check selected items.lua" type="script" desc="Comb-filtering check selected items">
       <metadata>
         <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
@@ -104,6 +152,25 @@ add control for timefall showing last note]]></changelog>
     <reapack name="mpl_Copy MIDI notes from selected item.lua" type="script" desc="Copy MIDI notes from selected item">
       <version name="1.0" author="MPL" time="2023-04-02T20:21:34Z">
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b07b32563d529a1a4851af513b9b1171a6e9aefb/Outdated%20unsupported/mpl_Copy%20MIDI%20notes%20from%20selected%20item.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Copy selection area of active take to new track.lua" type="script" desc="Copy selection area of active take to new track">
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Copy%20selection%20area%20of%20active%20take%20to%20new%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Copy selection area of take under mouse cursor to new track.lua" type="script" desc="Copy selection area of take under mouse cursor to new track">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# update for use with REAPER 5.981+]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Copy%20selection%20area%20of%20take%20under%20mouse%20cursor%20to%20new%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Delete take number x from selected items.lua" type="script" desc="Delete take number x from selected items">
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Delete%20take%20number%20x%20from%20selected%20items.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Generate JSFX skin.lua" type="script" desc="Generate JSFX skin">
@@ -194,6 +261,31 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ test]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Record%20take%20(prompt%20for%20filename).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Region chord editor.lua" type="script" desc="Region chord editor">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=165672</link>
+      </metadata>
+      <version name="1.04" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[+ use existed regions color map, otherwise on cropping current region use previous color
+# disable text wrap
+# set edit cursor to start of newly added region
+# dark/ignore regions contain @ character]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Region%20chord%20editor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_RegionManager.lua" type="script" desc="RegionManager">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.10" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# fix Clear button]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager.lua</source>
+        <source file="mpl_RegionManager_functions/mpl_RegionManager_GUI.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_GUI.lua</source>
+        <source file="mpl_RegionManager_functions/mpl_RegionManager_MOUSE.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_MOUSE.lua</source>
+        <source file="mpl_RegionManager_functions/mpl_RegionManager_data.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_data.lua</source>
+        <source file="mpl_RegionManager_functions/mpl_RegionManager_obj.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_obj.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Search ReaControlMIDI bank.lua" type="script" desc="Search ReaControlMIDI bank">
@@ -949,6 +1041,13 @@ add control for timefall showing last note]]></changelog>
       </version>
     </reapack>
   </category>
+  <category name="SWS dependent/BR_GetMidiTakePoolGUID">
+    <reapack name="mpl_Color pooled MIDI takes as selected reference.lua" type="script" desc="Color pooled MIDI takes as selected reference">
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/SWS%20dependent/BR_GetMidiTakePoolGUID/mpl_Color%20pooled%20MIDI%20takes%20as%20selected%20reference.lua</source>
+      </version>
+    </reapack>
+  </category>
   <category name="SWS dependent/BR_GetMouseCursorContext">
     <reapack name="mpl_Reset pitchbend at mouse cursor.lua" type="script" desc="Reset pitchbend under mouse cursor">
       <metadata>
@@ -1017,8 +1116,37 @@ add control for timefall showing last note]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b256cc8ea0acad447ae60410e945c9ee54aa3c42/SWS%20dependent/SNM_AddTCPFXParm/mpl_Add%20time%20adjustment%20JSFX%20to%20selected%20tracks%20(with%20delay%20TCP).lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_Apply visibility of focused FX TCP controls to instances in selected tracks.lua" type="script" desc="Apply visibility of focused FX TCP controls to instances in selected tracks">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# fixed for custom plugin aliases]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/SWS%20dependent/SNM_AddTCPFXParm/mpl_Apply%20visibility%20of%20focused%20FX%20TCP%20controls%20to%20instances%20in%20selected%20tracks.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Use chunking">
+    <reapack name="mpl_Clear TCP controls for selected tracks.lua" type="script" desc="Clear TCP controls for selected tracks">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[+ init port from mpl_LearnManager]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking/mpl_Clear%20TCP%20controls%20for%20selected%20tracks.lua</source>
+      </version>
+    </reapack>
   </category>
   <category name="Use chunking/envelope">
+    <reapack name="mpl_Apply selected track pan to its pre-fader sends pan.lua" type="script" desc="Apply selected track pan to its pre-fader sends pan">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[# set envelope visible and armed]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking/envelope/mpl_Apply%20selected%20track%20pan%20to%20its%20pre-fader%20sends%20pan.lua</source>
+      </version>
+    </reapack>
     <reapack name="mpl_Decrease selected tracks envelopes heights.lua" type="script" desc="Decrease selected tracks envelopes heights">
       <metadata>
         <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
@@ -1062,6 +1190,15 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[+ Init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/envelope/mpl_Toggle%20bypass%20trim%20envelope.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Toggle tempo envelope.lua" type="script" desc="Toggle tempo envelope">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking/envelope/mpl_Toggle%20tempo%20envelope.lua</source>
       </version>
     </reapack>
   </category>
@@ -1226,6 +1363,15 @@ add control for timefall showing last note]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Paste%20LFO%20settings%20for%20last%20touched%20FX%20parameter.lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_Randomize stretch markers.lua" type="script" desc="Randomize stretch markers">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[+ init ]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking_but_available_to_use_API/mpl_Randomize%20stretch%20markers.lua</source>
+      </version>
+    </reapack>
     <reapack name="mpl_ReplaceFX.lua" type="script" desc="ReplaceFX">
       <metadata>
         <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
@@ -1248,6 +1394,15 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Split%20focused%20plugin%20into%20to%20left%20right%20instances.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Stretch marker guard.lua" type="script" desc="Stretch marker guard">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.1" author="MPL" time="2023-04-02T21:23:41Z">
+        <changelog><![CDATA[+ Acion: Remove all non-1x stretch markers from selected takes]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking_but_available_to_use_API/mpl_Stretch%20marker%20guard.lua</source>
       </version>
     </reapack>
   </category>
