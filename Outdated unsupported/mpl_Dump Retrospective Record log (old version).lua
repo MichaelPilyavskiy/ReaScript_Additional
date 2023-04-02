@@ -5,7 +5,7 @@
 -- @about Dump recent MIDI messages log
 -- @changelog 
 --    # fix description, remove VF dependency
-
+-- @noindex
 
   function DumpRetrospectiveLog_CollectEvents()
     local t = {}

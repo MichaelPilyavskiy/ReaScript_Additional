@@ -4,7 +4,7 @@
 -- @changelog
 --    # fix wrong decoding MIDI integer
 -- @website http://forum.cockos.com/member.php?u=70694
-
+-- @noindex
 
   -- osc = '/1/fader4'
   -- is_soft_takeover = 0
