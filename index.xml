@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="96c26e90623f24f1935fd17c54bad671652ead45">
+<index version="1" name="MPL_Additional" commit="2e8a01f9fee74dcd4df093d1f934e1769c38d039">
   <category name="CustomDevelopment">
     <reapack name="mpl_Glue selected items by custom defined counts.lua" type="script" desc="Glue selected items by custom defined counts">
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
@@ -29,6 +29,24 @@
         <changelog><![CDATA[# 1-based markers count
 # exculde number sign from marker name]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/JS%20API%20dependent/JS_Dialog_BrowseForSaveFile/mpl_Generate%20CUE%20from%20project%20markers.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Not finished">
+    <reapack name="mpl_SessionView.lua" type="script" desc="Session view">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Basic ableton session view port. Limitation: clip is hard snapped into scene by its length, so it is not completely free-running - it will be cut off by scene boundaries and triggerring clip triggers it from closer clip boundary, not the closest beat. Clips can`t be triggerer at exact same time.\par}
+}
+]]></description>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0alpha2" author="MPL" time="2023-04-10T19:22:46Z">
+        <changelog><![CDATA[+ HW feedback/Launchpad MK2: map Launchpad MK2]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/2e8a01f9fee74dcd4df093d1f934e1769c38d039/Not%20finished/mpl_SessionView.lua</source>
       </version>
     </reapack>
   </category>
