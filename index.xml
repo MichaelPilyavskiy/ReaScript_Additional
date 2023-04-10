@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="762cf20b8488f72da8e65684929cdce77c1993c2">
+<index version="1" name="MPL_Additional" commit="96c26e90623f24f1935fd17c54bad671652ead45">
   <category name="CustomDevelopment">
     <reapack name="mpl_Glue selected items by custom defined counts.lua" type="script" desc="Glue selected items by custom defined counts">
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
@@ -1071,6 +1071,43 @@ add control for timefall showing last note]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Create%20send%20from%20focused%20FX%20insert.lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_Import Winamp Playlist.lua" type="script" desc="Import Winamp Playlist">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Import%20Winamp%20Playlist.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Isomorphic keyboard.lua" type="script" desc="Isomorphic keyboard">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.09" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[# fixed B root scale decoding]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Isomorphic%20keyboard.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Reset internal windows xy positions.lua" type="script" desc="Reset internal windows xy positions">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Reset%20internal%20windows%20xy%20positions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Send tracks (background).lua" type="script" desc="Send tracks">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[# refresh matrix after changing 
++ clear matrix button]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/SWS%20dependent/BR_Win32_GetPrivateProfileString/mpl_Send%20tracks%20(background).lua</source>
+      </version>
+    </reapack>
   </category>
   <category name="SWS dependent/SNM_AddTCPFXParm">
     <reapack name="mpl_Add channel strip controls to selected tracks TCP.lua" type="script" desc="Add channel strip controls to selected tracks TCP">
@@ -1123,6 +1160,12 @@ add control for timefall showing last note]]></changelog>
       <version name="1.01" author="MPL" time="2023-04-02T21:23:41Z">
         <changelog><![CDATA[# fixed for custom plugin aliases]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/SWS%20dependent/SNM_AddTCPFXParm/mpl_Apply%20visibility%20of%20focused%20FX%20TCP%20controls%20to%20instances%20in%20selected%20tracks.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Toggle auto add last touched parameter to TCP (background).lua" type="script">
+      <version name="1.0" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[+ init release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/SWS%20dependent/SNM_AddTCPFXParm/mpl_Toggle%20auto%20add%20last%20touched%20parameter%20to%20TCP%20(background).lua</source>
       </version>
     </reapack>
   </category>
@@ -1343,6 +1386,17 @@ add control for timefall showing last note]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/track/mpl_Add%20FXChain%20to%20selected%20track.lua</source>
       </version>
     </reapack>
+    <reapack name="mpl_Set MCP collapsed states from TCP.lua" type="script" desc="Set MCP collapsed states from TCP">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2023-04-10T18:32:07Z">
+        <changelog><![CDATA[# a branch from unstable script mpl_Link TCP MCP folder collapsed state (running in background)
+# avoid SWS dependency
+# avoid chunking as much as possible]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/96c26e90623f24f1935fd17c54bad671652ead45/Use%20chunking/track/mpl_Set%20MCP%20collapsed%20states%20from%20TCP.lua</source>
+      </version>
+    </reapack>
   </category>
   <category name="Use chunking_but_available_to_use_API">
     <reapack name="mpl_Copy LFO settings from last touched FX parameter.lua" type="script" desc="Copy LFO settings from last touched FX parameter">
@@ -1394,15 +1448,6 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[+ init]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking_but_available_to_use_API/mpl_Split%20focused%20plugin%20into%20to%20left%20right%20instances.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mpl_Stretch marker guard.lua" type="script" desc="Stretch marker guard">
-      <metadata>
-        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
-      </metadata>
-      <version name="1.1" author="MPL" time="2023-04-02T21:23:41Z">
-        <changelog><![CDATA[+ Acion: Remove all non-1x stretch markers from selected takes]]></changelog>
-        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Use%20chunking_but_available_to_use_API/mpl_Stretch%20marker%20guard.lua</source>
       </version>
     </reapack>
   </category>
