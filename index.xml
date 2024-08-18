@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="8e122a5bb11bf88c2e4b2306c7793d418f2ea8e7">
+<index version="1" name="MPL_Additional" commit="5c901c4b84638cfe03b6fa4fa8f0085818d34bae">
   <category name="CustomDevelopment">
     <reapack name="mpl_Create FX send from selected tracks (custom).lua" type="script" desc="Create FX send from selected tracks (custom)">
       <metadata>
@@ -313,6 +313,42 @@ add control for timefall showing last note]]></changelog>
         <source file="mpl_RegionManager_functions/mpl_RegionManager_MOUSE.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_MOUSE.lua</source>
         <source file="mpl_RegionManager_functions/mpl_RegionManager_data.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_data.lua</source>
         <source file="mpl_RegionManager_functions/mpl_RegionManager_obj.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_RegionManager_functions/mpl_RegionManager_obj.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Restore focused FX parent track bypass states.lua" type="script" desc="Restore focused FX parent track bypass states">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2024-08-18T11:13:09Z">
+        <changelog><![CDATA[# VF independent]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/5c901c4b84638cfe03b6fa4fa8f0085818d34bae/Outdated%20unsupported/mpl_Restore%20focused%20FX%20parent%20track%20bypass%20states.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Retrospective record of focused FX parameter tweaks - dump.lua" type="script" desc="Retrospective record of focused FX parameter tweaks - dump">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2024-08-18T11:13:09Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/5c901c4b84638cfe03b6fa4fa8f0085818d34bae/Outdated%20unsupported/mpl_Retrospective%20record%20of%20focused%20FX%20parameter%20tweaks%20-%20dump.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Retrospective record of focused FX parameter tweaks - log (background).lua" type="script" desc="Retrospective record of focused FX parameter tweaks - log (background)">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2024-08-18T11:13:09Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/5c901c4b84638cfe03b6fa4fa8f0085818d34bae/Outdated%20unsupported/mpl_Retrospective%20record%20of%20focused%20FX%20parameter%20tweaks%20-%20log%20(background).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Save focused FX parent track bypass states.lua" type="script" desc="Save focused FX parent track bypass states">
+      <metadata>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2024-08-18T11:13:09Z">
+        <changelog><![CDATA[+ init ]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/5c901c4b84638cfe03b6fa4fa8f0085818d34bae/Outdated%20unsupported/mpl_Save%20focused%20FX%20parent%20track%20bypass%20states.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Search ReaControlMIDI bank.lua" type="script" desc="Search ReaControlMIDI bank">
