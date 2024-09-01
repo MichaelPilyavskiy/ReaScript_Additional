@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="a581fac161bb9f31cccd821ada0a5f5503269a74">
+<index version="1" name="MPL_Additional" commit="6a9b481c216456dc8c38599a3be292d3f87f7f8b">
   <category name="CustomDevelopment">
     <reapack name="mpl_Conditional bounce-in-place.lua" type="script" desc="Conditional bounce-in-place">
       <metadata>
@@ -257,6 +257,16 @@ add control for timefall showing last note]]></changelog>
 # fix update tracklist after showing envelopes
 # fix replacing multiple empty lines in learn chunks]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_LearnManager%20(background).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Monitor selected track with track 1.lua" type="script" desc="Monitor selected track with track 1">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2024-09-01T07:50:53Z">
+        <changelog><![CDATA[# remove SWS dependency
+# cleanup]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/6a9b481c216456dc8c38599a3be292d3f87f7f8b/Outdated%20unsupported/mpl_Monitor%20selected%20track%20with%20track%201.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Morph sends.lua" type="script" desc="test_Morph Sends">
@@ -531,6 +541,15 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ test]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Swap%20source%20of%20selected%20takes.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_TalkBack Track 1 (MIDI CC and OSC only).lua" type="script" desc="TalkBack Track 1 (MIDI CC and OSC only)">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=165672</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2024-09-01T07:50:53Z">
+        <changelog><![CDATA[+ init]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/6a9b481c216456dc8c38599a3be292d3f87f7f8b/Outdated%20unsupported/mpl_TalkBack%20Track%201%20(MIDI%20CC%20and%20OSC%20only).lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Toggle stretch selected items positions (background).lua" type="script" desc="Toggle stretch selected items positions">
