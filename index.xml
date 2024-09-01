@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="be072342f5505316e6725609acca8fc5ea82af65">
+<index version="1" name="MPL_Additional" commit="a581fac161bb9f31cccd821ada0a5f5503269a74">
   <category name="CustomDevelopment">
+    <reapack name="mpl_Conditional bounce-in-place.lua" type="script" desc="Conditional bounce-in-place">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="1.03" author="MPL" time="2024-09-01T05:38:16Z">
+        <changelog><![CDATA[# crop to active take on source item]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/a581fac161bb9f31cccd821ada0a5f5503269a74/CustomDevelopment/mpl_Conditional%20bounce-in-place.lua</source>
+      </version>
+    </reapack>
     <reapack name="mpl_Create FX send from selected tracks (custom).lua" type="script" desc="Create FX send from selected tracks (custom)">
       <metadata>
         <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
@@ -155,6 +164,15 @@ add control for timefall showing last note]]></changelog>
       <version name="1.02" author="MPL" time="2023-04-02T21:23:41Z">
         <changelog><![CDATA[# fix check for external package]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/762cf20b8488f72da8e65684929cdce77c1993c2/Outdated%20unsupported/mpl_Add%20to%20render%20queue%20selected%20tracks%20with%20their%20sends.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Align selected track items vertically (free positioned mode).lua" type="script" desc="Align selected track items vertically (free positioned mode)">
+      <metadata>
+        <link rel="website">http://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.02" author="MPL" time="2024-09-01T05:38:16Z">
+        <changelog><![CDATA[# remove SWS dependency]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/a581fac161bb9f31cccd821ada0a5f5503269a74/Outdated%20unsupported/mpl_Align%20selected%20track%20items%20vertically%20(free%20positioned%20mode).lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Comb-filtering check selected items.lua" type="script" desc="Comb-filtering check selected items">
