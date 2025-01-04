@@ -1,0 +1,57 @@
+-- general
+UI.parse_artist = 1
+UI.progress_enabled = 1
+
+-- timing
+UI.transition_sec = 0.7
+UI.fadeout_curnote = 0.9
+
+-- item color obeying
+UI.timecode_color_from_itcol = 0
+UI.artist_color_from_itcol = 1
+UI.note_color_from_itcol = 0
+UI.timecode_back_fullh = 0
+UI.artist_back_fullh = 0
+
+-- normal mode
+UI.offset_note = 2
+
+-- offsets
+UI.progress_right_offset = 0
+UI.progress_top_offset = 0
+UI.progress_use_offset = 0
+UI.txt_yoffset = 5
+
+-- width
+UI.timecode_width_px = 100
+UI.text_fixed_w = 525
+UI.artist_width = 90
+
+-- height
+UI.txt_separatorH = 25
+
+--colors
+UI.theme_backgr = '#191919'
+UI.txt_col_notrack = '#C5C5C5'
+UI.txt_col_notes = '#C5C5C5'
+UI.txt_col_timecode = '#C5C5C5'
+UI.txt_col_artist = '#C5C5C5'
+UI.progress_col = '#FF0F0F'
+
+--alpha
+UI.txt_alpha_active = 1
+UI.txt_alpha_inactive = 0.5
+UI.fill_background_color_alpha = 0.2
+UI.progress_a = 0.3
+UI.progress_recordonly = 1
+
+-- font
+UI.font = 'SF Pro Display'
+UI.fontsz_note = 25
+UI.fontsz_artist = 15
+UI.fontsz_timecode = 21
+
+-- Freeze Mode
+UI.freezemode_limitratio = 0.5
+UI.freezemode_incrementpixel = 1
+UI.freezemode_offsetnote = 2
