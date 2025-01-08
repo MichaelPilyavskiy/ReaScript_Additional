@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="fd518b660e27cef337801fea0f284e0a65fe77ba">
+<index version="1" name="MPL_Additional" commit="93c126544b673cd3909703663fb044426caca7f6">
   <category name="CustomDevelopment">
     <reapack name="mpl_Conditional bounce-in-place.lua" type="script" desc="Conditional bounce-in-place">
       <metadata>
@@ -53,6 +53,29 @@
       <version name="1.02" author="MPL" time="2025-01-04T21:12:19Z">
         <changelog><![CDATA[# fix boundaries]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/59e2698575e0f36510cf0712910030e08da5c634/CustomDevelopment/subt/Generate%20bypass%20envelope%20from%20item%20selection.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Functions">
+    <reapack name="mpl_Various_functions.lua" type="script" desc="Various_functions">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Functions used by MPL scripts.\par}
+}
+]]></description>
+        <link rel="website">http://forum.cockos.com/member.php?u=70694</link>
+      </metadata>
+      <version name="3.65" author="MPL" time="2025-01-08T20:38:07Z">
+        <changelog><![CDATA[# fix VF_GetFXByGUID]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions.lua</source>
+        <source file="mpl_Various_functions_v1.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions_v1.lua</source>
+        <source file="mpl_Various_functions_v3.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions_v3.lua</source>
+        <source file="mpl_Various_functions_GUI.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions_GUI.lua</source>
+        <source file="mpl_Various_functions_MOUSE.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions_MOUSE.lua</source>
+        <source file="mpl_Various_functions_Pers.lua">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Functions/mpl_Various_functions_Pers.lua</source>
       </version>
     </reapack>
   </category>
@@ -530,6 +553,35 @@ add control for timefall showing last note]]></changelog>
       <version name="1.0" author="MPL" time="2023-04-01T20:35:33Z">
         <changelog><![CDATA[+ test]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/d3ab99aebc2bbae8b893cf20a225c54dd205170e/Outdated%20unsupported/mpl_Sort%20tracks%20in%20user%20defined%20order.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Spectral search.lua" type="script" desc="Spectral search">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Script allows to search audio data spectrum match based on given piece of other audio data\par}
+}
+]]></description>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2025-01-08T20:38:07Z">
+        <changelog><![CDATA[+ initial release
++ Get source: take spectral print of selected track - item - take as matching source
++ Get destination: take spectral print of selected track - item - take as matching destination
++ Preset/Action: Share points to destination track as razor edits
++ Preset: allow to clear razor edits before sharing
++ Preset: Spectrum settings
++ Preset/Spectrum settings: FFT size
++ Preset/Spectrum settings: window, independent from FFT size, can overlap or be inside [0.5 x FFT size / Sample rate]
++ Preset/PointsDetectionAlgorithm: allow to limit source length
++ Preset/PointsDetectionAlgorithm: allow to set threshold for minimum difference betweeen src and dest
++ Preset/Initialization: various init options
++ GUI: show source
++ GUI/Difference graph: show difference graph
++ GUI/Difference graph: show points detection threshold]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/93c126544b673cd3909703663fb044426caca7f6/Outdated%20unsupported/mpl_Spectral%20search.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Store incoming SysEx into current project (background).lua" type="script" desc="Store incoming SysEx into current project (background)">
