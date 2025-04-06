@@ -1,20 +1,15 @@
 -- @description Save selected tracks FX chains
--- @version 1.06
+-- @version 1.0
 -- @author MPL
 -- @website http://forum.cockos.com/showthread.php?p=2137484
 -- @changelog
---    # fix loading ext config
+--    # clean up for forum post
   
-  
-  
-  conf = {}
-  ---------------------------------------------------
-  function ExtState_Def()  
-    return {
-            saving_folder = '',
-            ES_key = 'MPL_SaveSelTrChains',
-            }
-  end
+    for key in pairs(reaper) do _G[key]=reaper[key] end 
+  ------------------------------------------------------------------------------------------------------
+  function literalize(str) -- http://stackoverflow.com/questions/1745448/lua-plain-string-gsub
+     if str then  return str:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", function(c) return "%" .. c end) end
+  end 
   ---------------------------------------------------
   function ExtractFXChunk(track )
     if TrackFX_GetCount( track ) == 0 then return end 
@@ -38,13 +33,7 @@
         local ts = os.date():gsub('%:', '-')
         fn_template = 'UntitledProject_'..ts
       end
-      local retval0
-      if conf.saving_folder and conf.saving_folder:gsub('%s+', '') ~= '' then 
-        saving_folder = conf.saving_folder
-        retval0 = 1
-       else 
-        retval0,  saving_folder = JS_Dialog_BrowseForSaveFile('Save selected tracks FX Chains', proj_path, fn_template, ".RfxChain")
-      end
+      local retval0,  saving_folder = JS_Dialog_BrowseForSaveFile('Save selected tracks FX Chains', proj_path, fn_template, ".RfxChain")
       if retval0 ~= 1 then return end
       
     -- extract chunks
@@ -61,16 +50,6 @@
       --if ret1 == 0 then MB('Can`t create path', 'Error', 0) return end   
       for i = 1, #t do
         local fname = t[i].name
-        --local f = io.open (saving_folder..'/'..fname..'.RfxChain', 'r')
-        --[[if f then
-          if fname:match('%(v[%d]+%)') then
-            local vers = fname:match('.*(%(([%d]+)%))')
-            if tonumber(vers) then fname = fname:gsub('%([%d]+%)', '(v'..(tonumber(vers)+1)..')') else fname = fname..' (1)' end
-           else
-            fname = fname..' (1)'
-          end
-          f:close()
-        end]]
         local f = io.open (saving_folder..'/'..fname..'.RfxChain', 'w')
         if f then
           f:write(t[i].chunk)
@@ -79,16 +58,10 @@
       end
       
   end
-  ---------------------------------------------------------------------
-  function CheckFunctions(str_func) local SEfunc_path = reaper.GetResourcePath()..'/Scripts/MPL Scripts/Functions/mpl_Various_functions.lua' local f = io.open(SEfunc_path, 'r')  if f then f:close() dofile(SEfunc_path) if not _G[str_func] then  reaper.MB('Update '..SEfunc_path:gsub('%\\', '/')..' to newer version', '', 0) else return true end  else reaper.MB(SEfunc_path:gsub('%\\', '/')..' missing', '', 0) end   end 
-  --------------------------------------------------------------------  
-  local ret = CheckFunctions('VF_CalibrateFont') 
-  local ret2 = VF_CheckReaperVrs(5.95,true)    
-  if ret and ret2 then 
+  
     if JS_Dialog_BrowseForSaveFile then 
-      ExtState_Load(conf)
-      main(conf) 
+      main() 
      else 
       MB('Missed JS ReaScript API extension', 'Error', 0) 
     end
-  end
+    
