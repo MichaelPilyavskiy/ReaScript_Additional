@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="93c126544b673cd3909703663fb044426caca7f6">
+<index version="1" name="MPL_Additional" commit="37125844cc0510dbe846f83e26720639ef7eea7f">
   <category name="CustomDevelopment">
     <reapack name="mpl_Conditional bounce-in-place.lua" type="script" desc="Conditional bounce-in-place">
       <metadata>
@@ -275,6 +275,22 @@ add control for timefall showing last note]]></changelog>
       <version name="1.01" author="MPL" time="2023-04-02T20:21:34Z">
         <changelog><![CDATA[# fix ReaPack header]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b07b32563d529a1a4851af513b9b1171a6e9aefb/Outdated%20unsupported/mpl_Generate%20MIDICC%20from%20audio%20take.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mpl_Import media folder content as structured tracks, ordered items.lua" type="script" desc="Import media folder content as structured tracks, ordered items">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Scan folder media and add media items on named tracks obey paths structure\par}
+}
+]]></description>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=188335</link>
+      </metadata>
+      <version name="1.01" author="MPL" time="2025-04-27T19:18:13Z">
+        <changelog><![CDATA[# VF independent]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/10a53bbfa1b83d1db078064285a3215170a8a852/Outdated%20unsupported/mpl_Import%20media%20folder%20content%20as%20structured%20tracks,%20ordered%20items.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Input audio check selected track.lua" type="script" desc="Input audio check selected track">
@@ -1526,6 +1542,10 @@ add control for timefall showing last note]]></changelog>
       <version name="1.06" author="MPL" time="2023-04-02T10:13:49Z">
         <changelog><![CDATA[# fix loading ext config]]></changelog>
         <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/19252cffa1580a02c1268bb1e1ec47a825cf35ea/Use%20chunking/FX/mpl_Save%20selected%20tracks%20FX%20chains.lua</source>
+      </version>
+      <version name="1.0" author="MPL" time="2025-04-06T05:55:15Z">
+        <changelog><![CDATA[# clean up for forum post]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/b89604ae5065d20900b885bf056b5a9765783860/Use%20chunking/FX/mpl_Save%20selected%20tracks%20FX%20chains.lua</source>
       </version>
     </reapack>
     <reapack name="mpl_Show selected tracks first FX embedded UI in MCP.lua" type="script" desc="Show selected tracks first FX embedded UI in MCP">
