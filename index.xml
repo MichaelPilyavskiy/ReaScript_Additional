@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="MPL_Additional" commit="37125844cc0510dbe846f83e26720639ef7eea7f">
+<index version="1" name="MPL_Additional" commit="cd983ada507b8d5ddb69993cca4d1cb3553efb3b">
+  <category name="AddedNatively2REAPER">
+    <reapack name="mpl_Multi-mono container.lua" type="script" desc="Multi-mono container">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 \fmodern Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 Convert any plugin into multi-mono container and managing it\par}
+}
+]]></description>
+        <link rel="website">https://forum.cockos.com/showthread.php?t=207971</link>
+      </metadata>
+      <version name="1.0" author="MPL" time="2026-09-27T17:27:36Z">
+        <changelog><![CDATA[+ initial release]]></changelog>
+        <source main="main">https://github.com/MichaelPilyavskiy/ReaScript_Additional/raw/cd983ada507b8d5ddb69993cca4d1cb3553efb3b/AddedNatively2REAPER/mpl_Multi-mono%20container.lua</source>
+      </version>
+    </reapack>
+  </category>
   <category name="CustomDevelopment">
     <reapack name="mpl_Conditional bounce-in-place.lua" type="script" desc="Conditional bounce-in-place">
       <metadata>
